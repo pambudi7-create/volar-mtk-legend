@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.puguhpambudi.volarmtk",
+        "sha256_cert_fingerprints": ["47:D5:16:D2:48:89:E3:01:36:98:6D:39:91:AC:F5:9C:A8:A9:8F:FD:55:2E:86:11:A0:40:14:FB:D0:FE:75:0E"]
+      }
+    }]
