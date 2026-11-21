@@ -1,0 +1,2061 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>VOLAR - MTK Legend</title>
+  <link rel="manifest" href="./manifest.json" />
+  <meta name="theme-color" content="#1e3a8a" />
+
+  <!-- MathJax untuk Notasi Matematika -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+  <!-- A-Frame & MindAR Image Tracking -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+  <style>
+    /* ===================================================================== */
+    /* SISTEM TEMA DARK & LIGHT MODE MODERN                                  */
+    /* ===================================================================== */
+    :root, [data-theme="dark"] {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --score-text: #38bdf8;
+      --bg: #090d16;
+      --bg-accent: radial-gradient(circle at 50% 0%, rgba(67, 56, 202, 0.25) 0%, transparent 65%);
+      --card: #131c31;
+      --surface: #0b1120;
+      --surface-elevated: #1e293b;
+      --border: #283655;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #f43f5e;
+      --gold: #fbbf24;
+      --gold-text: #fbbf24;
+      --star-empty: #334155;
+      --shadow: 0 14px 32px -6px rgba(0, 0, 0, 0.65);
+      --shadow-sm: 0 4px 10px -2px rgba(0, 0, 0, 0.35);
+      --header-bg: linear-gradient(135deg, #16143a 0%, #29246c 50%, #3730a3 100%);
+      --bottom-bar-bg: rgba(19, 28, 49, 0.94);
+      --victory-card-bg: radial-gradient(circle at 50% 24%, rgba(79, 70, 229, 0.28) 0%, #111827 60%, #090d16 100%);
+      --wing-bg: linear-gradient(145deg, rgba(30, 41, 59, 0.92), rgba(15, 23, 42, 0.96));
+    }
+
+    [data-theme="light"] {
+      --primary: #4f46e5;
+      --primary-dark: #3730a3;
+      --score-text: #4338ca;
+      --bg: #eef2f6;
+      --bg-accent: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 65%);
+      --card: #ffffff;
+      --surface: #f1f5f9;
+      --surface-elevated: #ffffff;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --muted: #64748b;
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #e11d48;
+      --gold: #f59e0b;
+      --gold-text: #b45309;
+      --star-empty: #cbd5e1;
+      --shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.14);
+      --shadow-sm: 0 3px 8px -2px rgba(15, 23, 42, 0.08);
+      --header-bg: linear-gradient(135deg, #312e81 0%, #4338ca 55%, #4f46e5 100%);
+      --bottom-bar-bg: rgba(255, 255, 255, 0.94);
+      --victory-card-bg: radial-gradient(circle at 50% 24%, rgba(99, 102, 241, 0.16) 0%, #ffffff 62%, #f8fafc 100%);
+      --wing-bg: linear-gradient(145deg, #ffffff, #f1f5f9);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      margin: 0; padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg);
+      background-image: var(--bg-accent);
+      background-attachment: fixed;
+      color: var(--text);
+      font-size: 15px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* APP BAR ATAS */
+    .app-bar {
+      position: sticky; top: 0; background: var(--header-bg); color: white;
+      padding: 10px 16px; display: flex; justify-content: space-between; align-items: center;
+      z-index: 100; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35); border-bottom: 2px solid #fbbf24;
+    }
+
+    .app-title-container { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+    .app-logo {
+      width: 34px; height: 34px; object-fit: contain; border-radius: 8px;
+      filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
+    }
+    .app-title {
+      font-weight: 900; font-size: 16px; letter-spacing: 0.4px; color: #fbbf24;
+      text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+    }
+
+    .app-bar-actions { display: flex; align-items: center; gap: 7px; }
+
+    .btn-icon-bar {
+      background: rgba(255, 255, 255, 0.14);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; cursor: pointer;
+      backdrop-filter: blur(4px);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-icon-bar:active { transform: scale(0.92); }
+
+    .btn-lock-secret {
+      opacity: 0.42; font-size: 14px; cursor: pointer; padding: 4px 6px;
+      transition: opacity 0.2s; user-select: none;
+    }
+    .btn-lock-secret:hover { opacity: 0.95; }
+
+    .btn-exit-top {
+      background: rgba(239, 68, 68, 0.25); color: #fecaca; border: 1px solid rgba(248, 113, 113, 0.5);
+      padding: 6px 11px; border-radius: 9px; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+
+    .main-container {
+      padding: 14px 14px 96px 14px; max-width: 540px; margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card); border-radius: 18px; padding: 18px;
+      border: 1px solid var(--border); margin-bottom: 14px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    /* HERO BERANDA */
+    .hero-banner {
+      text-align: center; padding: 10px 6px 6px 6px;
+    }
+    .hero-banner img {
+      width: 104px; height: 104px; object-fit: contain; border-radius: 18px;
+      filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.5));
+      animation: logoPulse 3s infinite ease-in-out;
+    }
+    .hero-title {
+      font-size: 22px; font-weight: 900; color: var(--gold-text);
+      letter-spacing: 0.8px; margin-top: 8px;
+    }
+    .hero-subtitle {
+      font-size: 12.5px; color: var(--muted); margin-top: 4px; line-height: 1.45;
+    }
+
+    @keyframes logoPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* 2 MENU UTAMA */
+    .menu-grid-2 {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;
+    }
+    .menu-card-btn {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: 16px; padding: 16px 12px; text-align: center;
+      cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+    }
+    .menu-card-btn:hover { border-color: var(--gold); transform: translateY(-2px); }
+    .menu-card-btn:active { transform: scale(0.97); }
+    .menu-card-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .menu-card-title { font-weight: 900; font-size: 14px; color: var(--text); }
+    .menu-card-desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+
+    /* TOMBOL & INPUT */
+    .select-field, .input-field {
+      width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+      border-radius: 12px; margin-top: 6px; margin-bottom: 14px;
+      font-size: 14px; background: var(--surface); color: var(--text); outline: none;
+    }
+    .select-field:focus, .input-field:focus { border-color: var(--primary); }
+
+    .select-field-sm {
+      padding: 5px 10px; border: 1.5px solid var(--primary); border-radius: 8px;
+      font-size: 11.5px; font-weight: 800; background: var(--surface); color: var(--gold-text); outline: none;
+      cursor: pointer;
+    }
+
+    .btn {
+      flex: 1; padding: 13px; border: none; border-radius: 12px;
+      font-weight: 800; font-size: 14px; cursor: pointer; text-align: center; transition: all 0.2s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%); color: white; }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1.5px solid var(--border); }
+    .btn-success { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; }
+    .btn-gold { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #0f172a; border: 1.5px solid #fde047; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ===================================================================== */
+    /* WEBAR FULLSCREEN OVERLAY                                              */
+    /* ===================================================================== */
+    #screen-ar {
+      position: fixed; inset: 0; z-index: 200; width: 100vw; height: 100vh;
+    }
+    .ar-hud-top {
+      position: fixed; top: 14px; left: 14px; right: 14px; z-index: 220;
+      display: flex; justify-content: space-between; align-items: center; pointer-events: none;
+    }
+    .ar-pill {
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.18); color: #f8fafc;
+      padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; pointer-events: auto;
+    }
+    .ar-hud-bottom {
+      position: fixed; bottom: 20px; left: 16px; right: 16px; z-index: 220;
+      background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px);
+      border: 1.5px solid #fbbf24; border-radius: 16px; padding: 14px; text-align: center;
+    }
+    .ar-hud-bottom h3 { margin: 0 0 4px 0; font-size: 14px; color: #fbbf24; font-weight: 900; }
+    .ar-hud-bottom p { margin: 0; font-size: 12px; color: #e2e8f0; line-height: 1.4; }
+
+    /* ===================================================================== */
+    /* LEADERBOARD MINIMIZE / MAXIMIZE DI LAYAR SISWA                        */
+    /* ===================================================================== */
+    .live-leaderboard-card {
+      background: var(--card);
+      border: 1.5px solid var(--primary); border-radius: 16px; padding: 12px 14px;
+      margin-bottom: 12px; box-shadow: var(--shadow-sm);
+    }
+    .lb-mini-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 8px; cursor: pointer; user-select: none;
+    }
+    .lb-mini-rank1-info {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12.5px; color: var(--text); flex: 1; min-width: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .btn-toggle-lb {
+      background: rgba(79, 70, 229, 0.15); border: 1px solid var(--primary);
+      color: var(--gold-text); font-size: 11px; font-weight: 800;
+      padding: 5px 10px; border-radius: 8px; cursor: pointer; white-space: nowrap;
+    }
+    .lb-expanded-section {
+      margin-top: 12px; padding-top: 10px; border-top: 1.5px dashed var(--border);
+    }
+    .lb-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 800; font-size: 12px; color: var(--gold-text);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px;
+    }
+    .lb-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px;
+      background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    }
+    .lb-row.top1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+    .lb-row.top2 { border-color: #94a3b8; background: rgba(148, 163, 184, 0.08); }
+    .lb-row.top3 { border-color: #d97706; background: rgba(217, 119, 6, 0.08); }
+
+    /* ===================================================================== */
+    /* KARTU STATUS RANK SISWA & BINTANG FISIK                               */
+    /* ===================================================================== */
+    .player-rank-card {
+      background: var(--victory-card-bg);
+      border: 2px solid var(--primary); border-radius: 18px; padding: 14px 16px;
+      margin-bottom: 14px; box-shadow: var(--shadow);
+      transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    }
+    .player-rank-main { display: flex; align-items: center; gap: 14px; }
+    .player-badge-box {
+      width: 72px; height: 72px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .player-badge-img {
+      width: 68px; height: 68px; object-fit: contain; border-radius: 10px;
+      animation: floatEmblem 3s infinite ease-in-out;
+    }
+    .unranked-shield {
+      width: 58px; height: 58px; border-radius: 14px; background: var(--surface);
+      border: 2px dashed var(--muted); display: flex; align-items: center;
+      justify-content: center; font-size: 24px; color: var(--muted);
+    }
+    @keyframes floatEmblem {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    .player-rank-info { flex: 1; min-width: 0; }
+    .player-sub-label {
+      font-size: 10px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted);
+    }
+    .player-tier-title {
+      font-size: 18px; font-weight: 900; letter-spacing: 0.8px;
+      margin: 2px 0 6px 0; text-transform: uppercase; line-height: 1.15;
+    }
+    .stars-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .star-icon { font-size: 19px; line-height: 1; }
+    .star-icon.active { color: #fbbf24; filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.9)); }
+    .star-icon.empty { color: var(--star-empty); }
+    .next-tier-pill {
+      margin-left: auto; font-size: 10px; font-weight: 800;
+      padding: 3px 8px; border-radius: 6px;
+      background: var(--surface); color: var(--muted); border: 1px solid var(--border);
+    }
+    .player-progress-footer {
+      margin-top: 12px; padding-top: 8px; border-top: 1px solid var(--border);
+    }
+    .player-progress-labels {
+      display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .progress-bar-bg {
+      width: 100%; height: 7px; background: var(--surface);
+      border-radius: 10px; margin-top: 6px; overflow: hidden; border: 1px solid var(--border);
+    }
+    .progress-bar-fill {
+      height: 100%; background: linear-gradient(90deg, #4f46e5, #10b981);
+      width: 0%; transition: width 0.3s ease;
+    }
+
+    /* ===================================================================== */
+    /* SOAL, OPSI & KUNCI JAWABAN PER SOAL                                   */
+    /* ===================================================================== */
+    .tier-badge {
+      font-size: 10px; font-weight: 800; padding: 2.5px 7px; border-radius: 6px;
+      color: white; display: inline-flex; align-items: center; gap: 4px; vertical-align: middle;
+      white-space: nowrap;
+    }
+    .option-card {
+      display: flex; align-items: center; padding: 14px 16px; border: 1.5px solid var(--border);
+      border-radius: 14px; margin-bottom: 12px; background: var(--surface); cursor: pointer;
+      transition: all 0.2s ease; box-shadow: var(--shadow-sm);
+    }
+    .option-card.selected-temp {
+      border-color: var(--gold); background-color: rgba(245, 158, 11, 0.14); font-weight: 600;
+    }
+    .option-card.selected-locked {
+      border-color: var(--success); background-color: rgba(16, 185, 129, 0.16); font-weight: 700;
+    }
+    .option-card.review-wrong {
+      border-color: var(--danger); background-color: rgba(244, 63, 94, 0.16); font-weight: 700;
+    }
+    .option-card.locked { cursor: not-allowed; }
+    .option-indicator {
+      width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border);
+      margin-right: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: var(--muted); flex-shrink: 0; background: var(--card);
+    }
+    .option-card.selected-temp .option-indicator { border-color: var(--gold); background: var(--gold); color: #0f172a; }
+    .option-card.selected-locked .option-indicator { border-color: var(--success); background: var(--success); color: white; }
+    .option-card.review-wrong .option-indicator { border-color: var(--danger); background: var(--danger); color: white; }
+
+    #disp-soal { margin: 12px 0 18px 0; font-size: 15.5px; line-height: 1.6; font-weight: 500; }
+
+    .number-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 14px; }
+    .num-btn {
+      padding: 10px 0; border: 1.5px solid var(--border); background: var(--surface);
+      border-radius: 10px; font-weight: 700; font-size: 14px; text-align: center; cursor: pointer; color: var(--muted);
+    }
+    .num-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(79, 70, 229, 0.15); font-weight: 900; }
+    .num-btn.draft-picked { border-color: var(--gold); color: var(--gold-text); background: rgba(245, 158, 11, 0.14); }
+    .num-btn.done { background: var(--success); color: white; border-color: var(--success); }
+
+    .lock-action-container { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--border); }
+    .btn-lock-answer {
+      width: 100%; padding: 14px 18px; border-radius: 13px; font-weight: 900; font-size: 13.5px;
+      letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; border: 2px solid #fbbf24;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #0f172a;
+      box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35);
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-lock-answer:disabled {
+      background: var(--surface); border: 1.5px dashed var(--border); color: var(--muted); box-shadow: none; cursor: not-allowed;
+    }
+    .locked-status-pill {
+      width: 100%; padding: 12px 16px; border-radius: 12px;
+      background: rgba(16, 185, 129, 0.14); border: 1.5px solid rgba(16, 185, 129, 0.5);
+      color: var(--success); font-weight: 800; font-size: 13px; text-align: center;
+    }
+
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--bottom-bar-bg); backdrop-filter: blur(10px);
+      padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 10px; z-index: 100;
+    }
+
+    /* ===================================================================== */
+    /* BATTLE RESULT CARD (KARTU HASIL SIAP SCREENSHOT)                      */
+    /* ===================================================================== */
+    .victory-snapshot-card {
+      background: var(--victory-card-bg); border: 2.5px solid var(--gold); border-radius: 22px;
+      padding: 15px 15px 11px 15px; display: flex; flex-direction: column; gap: 11px;
+      text-align: center; position: relative; overflow: hidden; box-shadow: var(--shadow); margin-bottom: 12px;
+    }
+    .victory-header-bar {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      border-bottom: 1px dashed var(--border); padding-bottom: 7px;
+    }
+    .victory-game-tag {
+      font-size: 10px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 999px; background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.45); color: var(--gold-text);
+    }
+    .victory-date-tag { font-size: 10.5px; font-weight: 700; color: var(--muted); }
+    .victory-student-name { font-size: 18.5px; font-weight: 900; color: var(--text); margin: 0; text-transform: uppercase; }
+    .victory-student-sub { font-size: 11.5px; font-weight: 700; color: var(--muted); margin-top: 2px; }
+    .victory-title-pill {
+      display: inline-block; margin-top: 5px; padding: 3px 12px; border-radius: 999px;
+      font-size: 10px; font-weight: 900; letter-spacing: 0.8px; text-transform: uppercase;
+      background: linear-gradient(90deg, rgba(79, 70, 229, 0.18), rgba(245, 158, 11, 0.22), rgba(79, 70, 229, 0.18));
+      border: 1px solid rgba(245, 158, 11, 0.5); color: var(--gold-text);
+    }
+    .victory-battle-stage { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 2px 0; }
+    .victory-wing {
+      flex: 1; background: var(--wing-bg); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 10px 6px; box-shadow: var(--shadow-sm); min-width: 0;
+    }
+    .victory-wing-left { border-left: 3.5px solid #fbbf24; }
+    .victory-wing-right { border-right: 3.5px solid var(--score-text); }
+    .wing-icon-tag { font-size: 9.5px; font-weight: 900; color: var(--muted); margin-bottom: 3px; }
+    .wing-main-val { font-size: 21px; font-weight: 900; line-height: 1.05; }
+    .wing-sub-note { font-size: 9.5px; font-weight: 700; color: var(--muted); margin-top: 3px; }
+
+    .victory-emblem-pedestal {
+      width: 116px; height: 116px; flex-shrink: 0; position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .victory-pedestal-box {
+      width: 108px; height: 108px; border-radius: 16px;
+      background: linear-gradient(145deg, #161f33 0%, #070b14 100%);
+      border: 2px solid var(--gold); display: flex; align-items: center; justify-content: center; padding: 4px;
+    }
+    .victory-badge-img { width: 100%; height: 100%; object-fit: contain; border-radius: 11px; }
+
+    .victory-tier-ribbon {
+      display: inline-block; font-size: 17px; font-weight: 900; letter-spacing: 1.2px;
+      text-transform: uppercase; padding: 5px 18px; border-radius: 12px;
+      background: var(--surface); border: 2px solid var(--gold);
+    }
+    .victory-stars-row { display: flex; justify-content: center; gap: 6px; margin-top: 4px; }
+    .victory-star-item { font-size: 20px; }
+
+    .combat-accuracy-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 8px 12px; }
+    .combat-labels-row { display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 900; margin-bottom: 5px; }
+    .combat-hit-pill { color: var(--success); }
+    .combat-miss-pill { color: var(--danger); }
+    .combat-rate-center {
+      font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 999px;
+      background: rgba(251, 191, 36, 0.15); color: var(--gold-text); border: 1px solid rgba(251, 191, 36, 0.35);
+    }
+    .combat-dual-track { width: 100%; height: 9px; border-radius: 999px; background: rgba(244, 63, 94, 0.25); overflow: hidden; display: flex; }
+    .combat-fill-hit { height: 100%; background: linear-gradient(90deg, #059669 0%, #10b981 60%, #34d399 100%); }
+    .combat-fill-miss { height: 100%; background: linear-gradient(90deg, #f43f5e 0%, #e11d48 100%); }
+
+    .in-card-podium-box { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 8px 10px; text-align: left; }
+    .in-card-podium-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 10.5px; font-weight: 900; color: var(--gold-text); margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border);
+    }
+    .mini-podium-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 4.5px 6px; border-radius: 8px; font-size: 11.5px; margin-bottom: 3px; }
+    .mini-podium-row.mp-1 { background: rgba(245, 158, 11, 0.12); }
+    .mini-podium-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800; }
+
+    .in-card-watermark {
+      border-top: 1px dashed var(--border); padding-top: 6px; font-size: 10px; font-weight: 700;
+      color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 5px;
+    }
+
+    /* ===================================================================== */
+    /* RANK UP SPLASH OVERLAY                                                */
+    /* ===================================================================== */
+    .rankup-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: radial-gradient(circle at center, rgba(30, 27, 75, 0.96) 0%, rgba(5, 8, 22, 0.99) 100%);
+      backdrop-filter: blur(10px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center;
+    }
+    .rankup-header-tag { font-size: 13px; font-weight: 900; letter-spacing: 3px; color: #fbbf24; margin-bottom: 6px; }
+    .rankup-main-title { font-size: 30px; font-weight: 900; letter-spacing: 2px; color: #ffffff; margin: 0 0 18px 0; }
+    .rankup-emblem-img { width: 155px; height: 155px; object-fit: contain; border-radius: 16px; margin-bottom: 16px; }
+    .rankup-tier-name {
+      font-size: 26px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
+      margin: 6px 0 12px 0; padding: 6px 20px; border-radius: 12px; background: rgba(15, 23, 42, 0.85); border: 2px solid #fbbf24;
+    }
+    .btn-rankup-close {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #0f172a;
+      font-weight: 900; font-size: 14px; padding: 14px 32px; border: 2px solid #fde047; border-radius: 14px; cursor: pointer;
+    }
+
+    /* ===================================================================== */
+    /* MODAL INFORMASI PENGEMBANG                                            */
+    /* ===================================================================== */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 500; background: rgba(5, 8, 22, 0.82);
+      backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-box {
+      background: var(--card); border: 2px solid var(--gold); border-radius: 20px;
+      max-width: 480px; width: 100%; max-height: 86vh; overflow-y: auto; padding: 20px; box-shadow: var(--shadow);
+    }
+    .dev-profile-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px;
+    }
+
+    /* ===================================================================== */
+    /* MODE PROYEKTOR GURU (FLIP ANIMATION & KELOLA SOAL)                    */
+    /* ===================================================================== */
+    .proj-container { max-width: 1040px; margin: 0 auto; padding: 12px; }
+    .proj-hero-header { text-align: center; margin-bottom: 16px; }
+    .proj-hero-logo { width: 88px; height: 88px; object-fit: contain; border-radius: 16px; }
+    .proj-hero-title { font-size: 26px; font-weight: 900; color: var(--gold-text); letter-spacing: 1.5px; margin-top: 6px; }
+    .proj-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px; border-radius: 12px; margin-bottom: 8px;
+      background: var(--surface); border: 1.5px solid var(--border); box-shadow: var(--shadow-sm);
+      position: relative; will-change: transform;
+    }
+    .proj-row.p-top1 { border-color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+    .proj-row.p-top2 { border-color: #94a3b8; background: rgba(148, 163, 184, 0.08); }
+    .proj-row.p-top3 { border-color: #d97706; background: rgba(217, 119, 6, 0.09); }
+    .proj-row.proj-row-promoted { z-index: 20; animation: overtakeGlow 1.8s ease-out forwards; }
+    @keyframes overtakeGlow {
+      0% { box-shadow: 0 0 0 rgba(16, 185, 129, 0); }
+      25% { box-shadow: 0 0 28px rgba(16, 185, 129, 0.85); border-color: #34d399; }
+      100% { box-shadow: var(--shadow-sm); }
+    }
+    .rank-delta-badge {
+      display: inline-flex; align-items: center; font-size: 11px; font-weight: 900;
+      padding: 2px 7px; border-radius: 6px; margin-left: 8px;
+    }
+    .rank-delta-up { background: rgba(16, 185, 129, 0.2); color: var(--success); border: 1px solid rgba(52, 211, 153, 0.6); }
+    .rank-delta-down { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
+    .rank-delta-new { background: rgba(251, 191, 36, 0.2); color: var(--gold-text); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL FULL-SCREEN RANK UP SPLASH -->
+  <div id="rankup-splash-modal" class="rankup-overlay hidden">
+    <div class="rankup-header-tag">★ TIER PROMOTION ★</div>
+    <h1 class="rankup-main-title">RANK UP!</h1>
+    <img id="rankup-modal-img" src="" class="rankup-emblem-img" alt="Rank Emblem" />
+    <div id="rankup-modal-tiername" class="rankup-tier-name">MYTHIC</div>
+    <div id="rankup-modal-stars" style="display:flex; gap:8px; justify-content:center; margin-bottom:24px;"></div>
+    <button class="btn-rankup-close" onclick="tutupModalRankUp()">⚔️ LANJUT PUSH RANK</button>
+  </div>
+
+  <!-- MODAL INFORMASI APLIKASI & PENGEMBANG -->
+  <div id="modal-info" class="modal-backdrop hidden" onclick="tutupModalInfo(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div style="text-align:center; margin-bottom:14px;">
+        <img src="./icons/icon-192.png" style="width:68px; height:68px; border-radius:14px; object-fit:contain;" alt="Logo VOLAR" />
+        <h2 style="margin:8px 0 2px 0; font-size:19px; color:var(--gold-text); font-weight:900;">VOLAR MTK LEGEND</h2>
+        <div style="font-size:12px; font-weight:700; color:var(--score-text);">Media Pembelajaran Matematika Berbasis Augmented Reality</div>
+      </div>
+
+      <p style="font-size:13px; line-height:1.55; color:var(--text); margin-bottom:10px;">
+        <b>VOLAR MTK LEGEND</b> merupakan media pembelajaran matematika berbasis Augmented Reality (AR) yang mengajak peserta didik mengeksplorasi berbagai jenis prisma dan menemukan konsep volume secara mandiri melalui visualisasi 3D interaktif.
+      </p>
+      <p style="font-size:13px; line-height:1.55; color:var(--text); margin-bottom:12px;">
+        Media ini mencakup eksplorasi berbagai jenis prisma, mulai dari prisma segiempat, prisma segitiga, hingga prisma dengan bentuk alas berupa poligon lainnya. Pembelajaran dirancang agar peserta didik tidak sekadar menghafalkan rumus, tetapi memahami bagaimana rumus tersebut terbentuk melalui proses penemuan konsep, hingga memperoleh generalisasi bahwa:
+      </p>
+      <div style="background:var(--surface); border:1.5px solid var(--gold); border-radius:12px; padding:10px; text-align:center; font-weight:900; color:var(--gold-text); font-size:14px; margin-bottom:16px;">
+        Volume Prisma = Luas Alas × Tinggi Prisma
+      </div>
+
+      <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px; margin-bottom:8px;">PENGEMBANG</div>
+      <div class="dev-profile-card">
+        <div style="font-weight:900; font-size:14px; color:var(--text);">Puguh Sri Pambudi, M.Pd., Gr.</div>
+        <div style="font-size:12px; color:var(--muted);">Guru Matematika • SMP Negeri 6 Yogyakarta</div>
+      </div>
+      <div class="dev-profile-card">
+        <div style="font-weight:900; font-size:14px; color:var(--text);">Diana Prastiwi, M.Pd., Gr.</div>
+        <div style="font-size:12px; color:var(--muted);">Guru Matematika • SMP Negeri 5 Yogyakarta</div>
+      </div>
+
+      <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px; margin:12px 0 6px 0;">LATAR BELAKANG AKADEMIK</div>
+      <p style="font-size:12.5px; line-height:1.5; color:var(--muted); margin:0 0 12px 0;">
+        Kedua pengembang merupakan alumni Magister Pendidikan Matematika Universitas Negeri Yogyakarta (UNY) dan alumni Program Pendidikan Profesi Guru (PPG) Universitas Sanata Dharma (USD).
+      </p>
+
+      <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px; margin-bottom:6px;">KONTAK</div>
+      <div style="font-size:12.5px; color:var(--text); line-height:1.6; margin-bottom:14px;">
+        <div>📧 Email: <b>pambudi.7@gmail.com</b></div>
+        <div>📱 Instagram &amp; TikTok: <b>@puguh.pambudi_</b></div>
+      </div>
+
+      <div style="text-align:center; font-size:11px; color:var(--muted); margin-bottom:12px;">
+        © 2026 VOLAR MTK LEGEND
+      </div>
+
+      <button type="button" class="btn btn-primary" style="width:100%;" onclick="tutupModalInfo()">Tutup Informasi</button>
+    </div>
+  </div>
+
+  <!-- APP BAR ATAS -->
+  <div class="app-bar">
+    <div class="app-title-container" onclick="kembaliKeBeranda()">
+      <img src="./icons/icon-192.png" class="app-logo" alt="Logo" />
+      <div class="app-title">VOLAR - MTK Legend</div>
+      <span class="btn-lock-secret" onclick="event.stopPropagation(); bukaModalGuru();" title="Mode Proyektor & Guru">🔒</span>
+    </div>
+    <div class="app-bar-actions">
+      <button type="button" class="btn-icon-bar" onclick="bukaModalInfo()" title="Informasi Aplikasi & Pengembang">ℹ️</button>
+      <button type="button" id="btn-theme-toggle" class="btn-icon-bar" onclick="toggleThemeMode()" title="Ganti Tema Dark/Light">☀️</button>
+      <button type="button" id="btn-top-exit" class="btn-exit-top hidden" onclick="konfirmasiKeluarKuis()">Keluar</button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- CONTAINER UTAMA SISWA                                                 -->
+  <!-- ===================================================================== -->
+  <div class="main-container" id="main-app-container">
+
+    <!-- 1. LAYAR BERANDA (2 MENU UTAMA) -->
+    <div id="screen-home">
+      <div class="card">
+        <div class="hero-banner">
+          <img src="./icons/icon-192.png" alt="Logo VOLAR MTK Legend" />
+          <div class="hero-title">VOLAR - MTK LEGEND</div>
+          <div class="hero-subtitle">
+            Eksplorasi Volume Prisma 3D Interaktif dengan Augmented Reality &amp; Uji Kemampuanmu di Kuis Push Rank!
+          </div>
+        </div>
+
+        <!-- 2 MENU UTAMA -->
+        <div class="menu-grid-2">
+          <div class="menu-card-btn" onclick="bukaModeAR()">
+            <div class="menu-card-icon" style="background: rgba(59, 130, 246, 0.16); color: #60a5fa;">📷</div>
+            <div class="menu-card-title">Eksplorasi AR</div>
+            <div class="menu-card-desc">Scan 4 Marker LKPD untuk melihat animasi 3D volume prisma</div>
+          </div>
+
+          <div class="menu-card-btn" onclick="bukaFormPushRank()">
+            <div class="menu-card-icon" style="background: rgba(245, 158, 11, 0.18); color: #fbbf24;">⚔️</div>
+            <div class="menu-card-title">Push Rank MTK</div>
+            <div class="menu-card-desc">Jawab tantangan kuis &amp; raih rank Mythical Immortal</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; font-size:11px; color:var(--muted); margin-top:16px;">
+          © 2026 VOLAR MTK LEGEND • <span style="color:var(--gold-text); cursor:pointer; font-weight:700;" onclick="bukaModalInfo()">Tentang Pengembang</span>
+        </div>
+      </div>
+
+      <!-- PANDUAN 4 MARKER LKPD -->
+      <div class="card">
+        <div style="font-weight:900; font-size:13px; color:var(--gold-text); margin-bottom:10px; text-transform:uppercase; letter-spacing:0.5px;">
+          📖 Panduan 4 Marker AR pada LKPD
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px; font-size:12.5px;">
+          <div style="background:var(--surface); padding:10px 12px; border-radius:12px; border:1px solid var(--border);">
+            <b style="color:#60a5fa;">Marker 1 — Kubus Satuan:</b> Mengenal kubus $1 \times 1 \times 1$ sebagai $1$ satuan volume.
+          </div>
+          <div style="background:var(--surface); padding:10px 12px; border-radius:12px; border:1px solid var(--border);">
+            <b style="color:#60a5fa;">Marker 2 — Balok ($3 \times 4 \times 3$):</b> Menyusun kubus satuan hingga menemukan $V = p \times l \times t = \text{Luas Alas} \times t$.
+          </div>
+          <div style="background:var(--surface); padding:10px 12px; border-radius:12px; border:1px solid var(--border);">
+            <b style="color:#60a5fa;">Marker 3 — Prisma Segitiga:</b> Pembelahan balok menjadi 2 prisma segitiga kongruen ($V = \text{Luas Alas} \times t$).
+          </div>
+          <div style="background:var(--surface); padding:10px 12px; border-radius:12px; border:1px solid var(--border);">
+            <b style="color:#60a5fa;">Marker 4 — Prisma Segilima:</b> Pembagian 3 prisma segitiga dengan sifat distributif ($V = \text{Luas Alas} \times t$).
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. FORM IDENTITAS PUSH RANK (TANPA SSO) -->
+    <div id="screen-login" class="card hidden">
+      <div style="text-align:center; margin-bottom:14px;">
+        <img src="./icons/icon-192.png" style="width:72px; height:72px; border-radius:14px; object-fit:contain;" alt="Logo" />
+        <h3 style="margin:6px 0 2px 0; color:var(--gold-text); font-size:18px; font-weight:900;">PERSIAPAN PUSH RANK</h3>
+        <div style="font-size:12px; color:var(--muted);">Isi identitasmu sebelum memasuki arena kuis</div>
+      </div>
+
+      <label><b>1. Nama Lengkap</b></label>
+      <input type="text" id="input-nama" class="input-field" placeholder="Ketik nama lengkapmu..." />
+
+      <label><b>2. Nomor Absen</b></label>
+      <input type="number" id="input-absen" class="input-field" placeholder="Contoh: 12" min="1" max="45" />
+
+      <label><b>3. Pilih Kelas</b></label>
+      <select id="input-kelas" class="select-field">
+        <option value="">-- Pilih Kelas --</option>
+        <option value="8A">8A</option>
+        <option value="8B">8B</option>
+        <option value="8C">8C</option>
+        <option value="8D">8D</option>
+        <option value="8E">8E</option>
+        <option value="8F">8F</option>
+        <option value="8G">8G</option>
+        <option value="8H">8H</option>
+      </select>
+
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button type="button" class="btn btn-secondary" onclick="kembaliKeBeranda()">Kembali</button>
+        <button type="button" class="btn btn-gold" id="btn-mulai-kuis" onclick="mulaiKuisPushRank()">⚔️ MULAI PUSH RANK</button>
+      </div>
+    </div>
+
+    <!-- 3. LAYAR ARENA SOAL PUSH RANK -->
+    <div id="screen-exam" class="hidden">
+
+      <!-- BANNER MODE TINJAU PEMBAHASAN -->
+      <div id="submitted-notice-banner" class="card hidden" style="border:2px solid var(--gold); text-align:center; padding:14px;">
+        <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px;">MODE TINJAU PEMBAHASAN SOAL</div>
+        <div id="submitted-stats-summary" style="margin-top:6px; font-size:13px;"></div>
+        <button type="button" class="btn btn-gold" style="margin-top:10px; padding:9px 14px; font-size:12px; width:100%;" onclick="kembaliKeKartuHasil()">
+          🏅 Kembali ke Kartu Hasil
+        </button>
+      </div>
+
+      <!-- LEADERBOARD LIVE (DEFAULT MINIMIZE HANYA TAMPIL #1, MAXIMIZE TAMPIL TOP 5) -->
+      <div class="live-leaderboard-card">
+        <div class="lb-mini-bar" onclick="toggleLeaderboardView()">
+          <div id="lb-mini-rank1" class="lb-mini-rank1-info">
+            <span style="color:var(--gold-text); font-weight:900;">👑 #1:</span>
+            <span style="color:var(--muted);">Memuat pemuncak klasemen...</span>
+          </div>
+          <button type="button" id="btn-toggle-lb" class="btn-toggle-lb">▼ Lihat Top 5</button>
+        </div>
+
+        <div id="lb-expanded-area" class="lb-expanded-section hidden">
+          <div class="lb-header">
+            <span>🏆 Top 5 Rank Tertinggi</span>
+            <select id="lb-class-filter" class="select-field-sm" onchange="muatLiveLeaderboardSiswa()">
+              <option value="MY_CLASS">Kelas Saya</option>
+              <option value="ALL">Semua Kelas</option>
+            </select>
+          </div>
+          <div id="lb-content">
+            <div style="text-align:center; color:var(--muted); font-size:12px; padding:6px;">Memuat klasemen...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KARTU STATUS RANK PRIBADI SISWA + BINTANG FISIK -->
+      <div id="player-rank-card" class="player-rank-card">
+        <div class="player-rank-main">
+          <div id="player-badge-container" class="player-badge-box">
+            <div class="unranked-shield">🛡️</div>
+          </div>
+          <div class="player-rank-info">
+            <div id="player-identity-label" class="player-sub-label">TIER SAAT INI</div>
+            <div id="player-tier-name" class="player-tier-title" style="color:#94a3b8;">UNRANKED</div>
+            <div class="stars-row">
+              <div id="player-stars-container" style="display:flex; gap:4px;"></div>
+              <span id="player-next-tier" class="next-tier-pill">Next: WARRIOR</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-progress-footer">
+          <div class="player-progress-labels">
+            <span>Progres Jawaban Terkunci</span>
+            <span id="disp-percent" style="color:var(--gold-text);">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div id="progress-bar-fill" class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NAVIGASI NOMOR SOAL -->
+      <div class="card" style="padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <b id="disp-progress" style="color:var(--gold-text); font-size:13.5px;">Soal 1 dari 0</b>
+          <button type="button" class="btn btn-secondary" style="flex:none; padding:6px 12px; font-size:12px;" onclick="toggleGrid()">Lihat Semua No</button>
+        </div>
+        <div id="grid-container" class="number-grid hidden"></div>
+      </div>
+
+      <!-- KARTU SOAL & TOMBOL KUNCI JAWABAN PER SOAL -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="color:var(--gold-text); font-weight:900; font-size:13px;" id="disp-no">SOAL 1</div>
+          <div id="disp-lock-badge" style="font-size:11px; font-weight:800;"></div>
+        </div>
+        <div id="disp-soal">Memuat soal...</div>
+        <div id="disp-options"></div>
+        <div id="lock-action-area" class="lock-action-container"></div>
+      </div>
+    </div>
+
+    <!-- 4. PEMERIKSAAN AKHIR SEBELUM KIRIM FINAL -->
+    <div id="screen-review" class="card hidden" style="text-align:center; padding:22px 18px;">
+      <h3 style="color:var(--gold-text); margin-top:0;">Pemeriksaan Akhir Jawaban</h3>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:12px;">
+        Hanya soal berstatus <b style="color:var(--success);">Hijau (Terkunci)</b> yang dihitung ke nilai akhir.
+      </p>
+      <div id="unlocked-warning-box" class="hidden" style="background:rgba(245,158,11,0.15); border:1px solid var(--warning); color:var(--gold-text); padding:10px; border-radius:10px; font-size:12px; margin-bottom:14px; font-weight:700;"></div>
+      <div id="review-grid-container" class="number-grid" style="margin-bottom:22px;"></div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary" onclick="kembaliKeUjian()">Kembali</button>
+        <button type="button" class="btn btn-success" id="btn-submit-final" onclick="konfirmasiKirimFinal()">Kirim Jawaban Final</button>
+      </div>
+    </div>
+
+    <!-- 5. BATTLE RESULT CARD (KARTU HASIL AKHIR) -->
+    <div id="screen-result" class="hidden">
+      <div id="victory-snapshot-card" class="victory-snapshot-card">
+        <div class="victory-header-bar">
+          <div class="victory-game-tag">⚔️ VOLAR - MTK LEGEND</div>
+          <div id="victory-date-tag" class="victory-date-tag">Battle Result</div>
+        </div>
+
+        <div>
+          <h2 id="victory-student-name" class="victory-student-name">NAMA SISWA</h2>
+          <div id="victory-student-sub" class="victory-student-sub">Kelas • Absen</div>
+          <div id="victory-achievement-title" class="victory-title-pill">👑 GRAND MATH SOVEREIGN</div>
+        </div>
+
+        <div class="victory-battle-stage">
+          <div class="victory-wing victory-wing-left">
+            <div class="wing-icon-tag">🏆 PERINGKAT</div>
+            <div id="final-my-rank" class="wing-main-val" style="color:var(--gold-text);">#1</div>
+            <div id="final-rank-sub" class="wing-sub-note">Klasemen Kelas</div>
+          </div>
+
+          <div class="victory-emblem-pedestal">
+            <div id="victory-pedestal-box" class="victory-pedestal-box">
+              <div id="victory-badge-holder" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;"></div>
+            </div>
+          </div>
+
+          <div class="victory-wing victory-wing-right">
+            <div class="wing-icon-tag">⚡ TOTAL SKOR</div>
+            <div id="final-my-nilai" class="wing-main-val" style="color:var(--score-text);">100 Pts</div>
+            <div id="final-score-sub" class="wing-sub-note">Akurasi 100%</div>
+          </div>
+        </div>
+
+        <div>
+          <div id="victory-tier-name" class="victory-tier-ribbon">MYTHICAL IMMORTAL</div>
+          <div id="victory-stars-row" class="victory-stars-row"></div>
+        </div>
+
+        <!-- Combat Accuracy Bar (Keterangan Benar & Salah Siswa) -->
+        <div class="combat-accuracy-card">
+          <div class="combat-labels-row">
+            <span id="final-hit-text" class="combat-hit-pill">✔ 0 BENAR</span>
+            <span id="final-accuracy-badge" class="combat-rate-center">100% WIN RATE</span>
+            <span id="final-miss-text" class="combat-miss-pill">0 SALAH ✖</span>
+          </div>
+          <div class="combat-dual-track">
+            <div id="combat-bar-hit" class="combat-fill-hit" style="width:100%;"></div>
+            <div id="combat-bar-miss" class="combat-fill-miss" style="width:0%;"></div>
+          </div>
+        </div>
+
+        <!-- Mini Podium Top 3 Kelas di Dalam Kartu Hasil -->
+        <div class="in-card-podium-box">
+          <div class="in-card-podium-header">
+            <span id="in-card-podium-title">🏆 TOP 3 KLASEMEN KELAS</span>
+            <span style="font-size:9.5px; color:var(--muted);">HALL OF FAME</span>
+          </div>
+          <div id="in-card-top3-list"></div>
+        </div>
+
+        <div class="in-card-watermark">
+          <span>⚔️ VOLAR - MTK LEGEND</span>
+          <span>•</span>
+          <span>Puguh Sri Pambudi &amp; Diana Prastiwi</span>
+        </div>
+      </div>
+
+      <!-- TOMBOL TINJAU PEMBAHASAN & SELESAI -->
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;">
+        <button type="button" class="btn btn-primary" style="width:100%; padding:14px;" onclick="bukaModeTinjauSoal()">
+          🔍 Tinjau Pembahasan Soal (Lihat Benar/Salah)
+        </button>
+        <button type="button" class="btn btn-secondary" style="width:100%;" onclick="kembaliKeBeranda()">
+          🏠 Kembali ke Beranda Utama
+        </button>
+      </div>
+
+      <!-- TOP 10 KLASEMEN DI BAWAH KARTU HASIL -->
+      <div class="card" style="padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:12px;">
+          <b style="color:var(--gold-text); font-size:13px; text-transform:uppercase;">🏆 Top 10 Klasemen</b>
+          <select id="result-lb-class-filter" class="select-field-sm" onchange="renderTop10Hasil()">
+            <option value="MY_CLASS">Kelas Saya</option>
+            <option value="ALL">Semua Kelas</option>
+          </select>
+        </div>
+        <div id="final-lb-container" style="background:var(--surface); border-radius:12px; border:1px solid var(--border); overflow:hidden;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LAYAR KAMERA WEBAR (MINDAR 4 MARKER)                                  -->
+  <!-- ===================================================================== -->
+  <div id="screen-ar" class="hidden">
+    <div class="ar-hud-top">
+      <button type="button" class="ar-pill" style="cursor:pointer;" onclick="tutupModeAR()">⬅ Kembali</button>
+      <div class="ar-pill" id="ar-status-badge" style="color:#93c5fd;">Mencari Marker LKPD...</div>
+    </div>
+    <div class="ar-hud-bottom">
+      <h3 id="ar-info-title">Arahkan Kamera ke Marker 1 – 4 pada LKPD</h3>
+      <p id="ar-info-desc">Pastikan pencahayaan terang dan seluruh bingkai marker terlihat di kamera.</p>
+    </div>
+    <div id="ar-container" style="width:100%; height:100%;"></div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MODE PROYEKTOR GURU & KELOLA SOAL                                     -->
+  <!-- ===================================================================== -->
+  <div id="screen-projector" class="proj-container hidden">
+    <div class="card">
+      <div class="proj-hero-header">
+        <img src="./icons/icon-192.png" class="proj-hero-logo" alt="Logo VOLAR" />
+        <div class="proj-hero-title">LIVE RANK • VOLAR - MTK LEGEND</div>
+        <div id="proj-stat-summary" style="font-size:13px; color:var(--muted); margin-top:4px;">Total Peserta: 0 Siswa</div>
+      </div>
+
+      <!-- TAB NAVIGASI GURU -->
+      <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+        <button type="button" class="btn btn-primary" style="flex:none; padding:9px 14px; font-size:12px;" onclick="switchGuruTab('tab-proj-board')">🖥️ Papan Peringkat Proyektor</button>
+        <button type="button" class="btn btn-gold" style="flex:none; padding:9px 14px; font-size:12px;" onclick="switchGuruTab('tab-proj-soal')">📝 Tambah / Upload Gambar Soal</button>
+        <button type="button" class="btn btn-secondary" style="flex:none; padding:9px 14px; font-size:12px; margin-left:auto;" onclick="tutupModeProyektor()">Keluar Mode Guru</button>
+      </div>
+
+      <!-- TAB 1: PAPAN PERINGKAT PROYEKTOR (FLIP ANIMATION) -->
+      <div id="tab-proj-board">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; background:var(--surface); padding:12px; border-radius:12px; border:1px solid var(--border); align-items:center;">
+          <select id="proj-sel-kelas" class="select-field" style="margin:0; flex:1; min-width:140px;" onchange="updateDataProyektor(false)">
+            <option value="ALL">Semua Kelas</option>
+            <option value="8A">Kelas 8A</option>
+            <option value="8B">Kelas 8B</option>
+            <option value="8C">Kelas 8C</option>
+            <option value="8D">Kelas 8D</option>
+            <option value="8E">Kelas 8E</option>
+            <option value="8F">Kelas 8F</option>
+            <option value="8G">Kelas 8G</option>
+            <option value="8H">Kelas 8H</option>
+          </select>
+
+          <select id="proj-sel-limit" class="select-field" style="margin:0; width:120px;" onchange="updateDataProyektor(false)">
+            <option value="5">Top 5</option>
+            <option value="10" selected>Top 10</option>
+            <option value="20">Top 20</option>
+            <option value="0">Semua</option>
+          </select>
+
+          <label style="display:flex; align-items:center; gap:6px; font-size:12px; font-weight:700; cursor:pointer; background:var(--card); padding:9px 12px; border-radius:10px; border:1px solid var(--border);">
+            <input type="checkbox" id="proj-hide-score" onchange="updateDataProyektor(true)" />
+            Sembunyikan Skor
+          </label>
+
+          <button type="button" class="btn btn-primary" id="btn-proj-update" style="flex:none; padding:10px 16px;" onclick="updateDataProyektor(false)">Update Data</button>
+        </div>
+
+        <div id="proj-board-container">
+          <div style="text-align:center; color:var(--muted); padding:24px;">Memuat papan peringkat...</div>
+        </div>
+      </div>
+
+      <!-- TAB 2: TAMBAH / UPLOAD GAMBAR SOAL -->
+      <div id="tab-proj-soal" class="hidden" style="max-width:540px; margin:0 auto;">
+        <h3 style="color:var(--gold-text); margin-top:0;">Tambah Soal Baru ke Spreadsheet</h3>
+        <label><b>Pertanyaan Soal</b></label>
+        <textarea id="admin-pertanyaan" class="input-field" rows="3" placeholder="Tulis pertanyaan matematika..."></textarea>
+
+        <label><b>Upload Gambar Bangun Ruang (Opsional)</b></label>
+        <input type="file" id="admin-gambar" class="input-field" accept="image/*" />
+
+        <label><b>Pilihan A</b></label>
+        <input type="text" id="admin-a" class="input-field" placeholder="Opsi A" />
+        <label><b>Pilihan B</b></label>
+        <input type="text" id="admin-b" class="input-field" placeholder="Opsi B" />
+        <label><b>Pilihan C</b></label>
+        <input type="text" id="admin-c" class="input-field" placeholder="Opsi C" />
+        <label><b>Pilihan D</b></label>
+        <input type="text" id="admin-d" class="input-field" placeholder="Opsi D" />
+
+        <label><b>Kunci Jawaban</b></label>
+        <select id="admin-kunci" class="select-field">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+
+        <button type="button" class="btn btn-success" id="btn-simpan-soal" style="width:100%;" onclick="simpanSoalBaruGuru()">💾 Simpan Soal ke Spreadsheet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM BAR NAVIGASI SOAL -->
+  <div id="bottom-bar" class="bottom-bar hidden">
+    <button type="button" class="btn btn-secondary" id="btn-prev" onclick="prevSoal()">Prev</button>
+    <button type="button" class="btn btn-primary" id="btn-next" onclick="nextSoal()">Next</button>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. KONFIGURASI URL WEB APP APPS SCRIPT (TEMPEL URL ANDA DI BAWAH INI)
+    // =========================================================================
+    const GAS_API_URL = "TEMPEL_URL_WEB_APP_APPS_SCRIPT_ANDA_DI_SINI";
+
+    // Daftarkan Service Worker
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(() => {});
+      });
+    }
+
+    // =========================================================================
+    // 2. TEMA DARK / LIGHT MODE & MODAL INFORMASI
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("VOLAR_THEME") || "dark";
+      applyThemeMode(savedTheme);
+    });
+
+    function toggleThemeMode() {
+      const cur = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = (cur === "dark") ? "light" : "dark";
+      applyThemeMode(next);
+      localStorage.setItem("VOLAR_THEME", next);
+    }
+
+    function applyThemeMode(theme) {
+      document.documentElement.setAttribute("data-theme", theme);
+      const btn = document.getElementById("btn-theme-toggle");
+      if (btn) btn.innerText = (theme === "dark") ? "☀️" : "🌙";
+    }
+
+    function bukaModalInfo() {
+      document.getElementById("modal-info").classList.remove("hidden");
+    }
+
+    function tutupModalInfo() {
+      document.getElementById("modal-info").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // 3. SISTEM TIER RANK (MYTHICAL IMMORTAL >= 90) & AUDIO ENGINE
+    // =========================================================================
+    function calcStarsClient(nilai, minVal, maxVal, maxStars) {
+      const span = Math.max(1, (maxVal - minVal + 1));
+      const ratio = Math.max(0, (nilai - minVal)) / span;
+      return Math.min(maxStars, Math.max(1, Math.floor(ratio * maxStars) + 1));
+    }
+
+    function getAchievementTitleClient(nilai) {
+      const n = Number(nilai) || 0;
+      if (n >= 95) return "👑 GRAND MATH SOVEREIGN";
+      if (n >= 90) return "🔥 SUPREME IMMORTAL MIND";
+      if (n >= 85) return "⚔️ SAVAGE MATH ASSASSIN";
+      if (n >= 75) return "⚡ MYTHICAL TACTICIAN";
+      if (n >= 68) return "🎯 ELITE SNIPER";
+      if (n >= 60) return "🛡️ VANGUARD WARRIOR";
+      return "⚔️ RISING CHALLENGER";
+    }
+
+    function getTierInfoClient(nilai) {
+      const n = Number(nilai) || 0;
+      if (n >= 90) return { level: 10, name: "MYTHICAL IMMORTAL", nextTier: "MAX TIER",        color: "#dc2626", logo: "./ranks/mythicalimmortal.png", stars: calcStarsClient(n, 90, 100, 5), maxStars: 5 };
+      if (n >= 85) return { level: 9,  name: "MYTHICAL GLORY",    nextTier: "MYTHICAL IMMORTAL", color: "#f43f5e", logo: "./ranks/mythicalglory.png",    stars: calcStarsClient(n, 85, 89, 5),  maxStars: 5 };
+      if (n >= 80) return { level: 8,  name: "MYTHICAL HONOR",    nextTier: "MYTHICAL GLORY",    color: "#a855f7", logo: "./ranks/mythicalhonor.png",    stars: calcStarsClient(n, 80, 84, 5),  maxStars: 5 };
+      if (n >= 75) return { level: 7,  name: "MYTHIC",            nextTier: "MYTHICAL HONOR",    color: "#7c3aed", logo: "./ranks/mythic.png",           stars: calcStarsClient(n, 75, 79, 5),  maxStars: 5 };
+      if (n >= 68) return { level: 6,  name: "LEGEND",            nextTier: "MYTHIC",            color: "#ec4899", logo: "./ranks/legend.png",           stars: calcStarsClient(n, 68, 74, 5),  maxStars: 5 };
+      if (n >= 60) return { level: 5,  name: "EPIC",              nextTier: "LEGEND",            color: "#3b82f6", logo: "./ranks/epic.png",             stars: calcStarsClient(n, 60, 67, 5),  maxStars: 5 };
+      if (n >= 50) return { level: 4,  name: "GRAND MASTER",      nextTier: "EPIC",              color: "#10b981", logo: "./ranks/grandmaster.png",      stars: calcStarsClient(n, 50, 59, 4),  maxStars: 4 };
+      if (n >= 35) return { level: 3,  name: "MASTER",            nextTier: "GRAND MASTER",      color: "#eab308", logo: "./ranks/master.png",           stars: calcStarsClient(n, 35, 49, 4),  maxStars: 4 };
+      if (n >= 20) return { level: 2,  name: "ELITE",             nextTier: "MASTER",            color: "#06b6d4", logo: "./ranks/elite.png",            stars: calcStarsClient(n, 20, 34, 3),  maxStars: 3 };
+      if (n > 0)   return { level: 1,  name: "WARRIOR",           nextTier: "ELITE",             color: "#78716c", logo: "./ranks/warior.png",           stars: calcStarsClient(n, 1, 19, 3),   maxStars: 3 };
+      return { level: 0, name: "UNRANKED", nextTier: "WARRIOR", color: "#64748b", logo: "", stars: 0, maxStars: 3 };
+    }
+
+    function getTierByNameClient(name) {
+      const target = (name || "").toUpperCase();
+      const samples = [100, 87, 82, 77, 70, 63, 55, 40, 25, 10, 0];
+      for (const s of samples) {
+        const t = getTierInfoClient(s);
+        if (t.name === target) return t;
+      }
+      return getTierInfoClient(0);
+    }
+
+    function buildStarsHtml(activeStars, maxStars, extraClass = "star-icon") {
+      let html = "";
+      for (let s = 1; s <= maxStars; s++) {
+        html += `<span class="${extraClass} ${s <= activeStars ? 'active' : 'empty'}">★</span>`;
+      }
+      return html;
+    }
+
+    let audioCtx = null;
+    function playLockClickSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(320, now);
+        osc.frequency.exponentialRampToValueAtTime(640, now + 0.09);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now); osc.stop(now + 0.13);
+      } catch (e) {}
+    }
+
+    function playFierceRankUpSound() {
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [146.83, 220.0, 293.66, 440.0].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+          gain.gain.setValueAtTime(0.14, now + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.06); osc.stop(now + 0.95);
+        });
+      } catch (e) {}
+    }
+
+    // =========================================================================
+    // 4. NAVIGASI LAYAR UTAMA & WEBAR (MINDAR)
+    // =========================================================================
+    function sembunyikanSemuaLayar() {
+      ["screen-home", "screen-login", "screen-exam", "screen-review", "screen-result"].forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      document.getElementById("bottom-bar").classList.add("hidden");
+    }
+
+    function kembaliKeBeranda() {
+      if (isQuizSubmitted) {
+        isQuizSubmitted = false;
+      }
+      sembunyikanSemuaLayar();
+      document.getElementById("btn-top-exit").classList.add("hidden");
+      document.getElementById("screen-home").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function bukaFormPushRank() {
+      sembunyikanSemuaLayar();
+      document.getElementById("screen-login").classList.remove("hidden");
+    }
+
+    const INFO_MARKER = [
+      { judul: "Marker 1: Kubus Satuan ABCD.EFGH", deskripsi: "Kubus berukuran 1 × 1 × 1 memiliki isi sebesar 1 satuan volume." },
+      { judul: "Marker 2: Volume Balok (3 × 4 × 3)", deskripsi: "Tersusun dari 36 kubus satuan. V = p × l × t = Luas Alas × Tinggi." },
+      { judul: "Marker 3: Pembelahan Balok ke Prisma Segitiga", deskripsi: "Dua prisma segitiga kongruen. V = ½ × p × l × t = Luas Alas Segitiga × Tinggi." },
+      { judul: "Marker 4: Prisma Segilima ke 3 Prisma Segitiga", deskripsi: "Dengan sifat distributif, V = (LΔ1 + LΔ2 + LΔ3) × t = Luas Alas × Tinggi." }
+    ];
+
+    function bukaModeAR() {
+      document.getElementById("screen-ar").classList.remove("hidden");
+      const container = document.getElementById("ar-container");
+
+      if (!AFRAME.components["smooth-anim"]) {
+        AFRAME.registerComponent("smooth-anim", {
+          init: function () {
+            this.mixer = null;
+            this.el.addEventListener("model-loaded", (e) => {
+              const model = e.detail.model;
+              if (model.animations && model.animations.length > 0) {
+                this.mixer = new THREE.AnimationMixer(model);
+                model.animations.forEach((clip) => {
+                  const action = this.mixer.clipAction(clip);
+                  action.timeScale = 0.85;
+                  action.play();
+                });
+              }
+            });
+          },
+          tick: function (time, delta) {
+            if (this.mixer) this.mixer.update(delta / 1000);
+          }
+        });
+      }
+
+      container.innerHTML = `
+        <a-scene
+          mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: yes; uiScanning: yes;"
+          color-space="sRGB"
+          renderer="colorManagement: true, physicallyCorrectLights"
+          vr-mode-ui="enabled: false"
+          device-orientation-permission-ui="enabled: false">
+          <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
+          <a-light type="directional" color="#ffffff" intensity="0.8" position="2 4 3"></a-light>
+          <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+          <a-entity id="target-0" mindar-image-target="targetIndex: 0">
+            <a-gltf-model src="./models/m1_kubus.glb" position="0 0 0.05" rotation="90 0 0" scale="0.28 0.28 0.28" smooth-anim></a-gltf-model>
+          </a-entity>
+          <a-entity id="target-1" mindar-image-target="targetIndex: 1">
+            <a-gltf-model src="./models/m2_balok.glb" position="0 0 0.05" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+          </a-entity>
+          <a-entity id="target-2" mindar-image-target="targetIndex: 2">
+            <a-gltf-model src="./models/m3_prisma3.glb" position="0 0 0.05" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+          </a-entity>
+          <a-entity id="target-3" mindar-image-target="targetIndex: 3">
+            <a-gltf-model src="./models/m4_prisma5.glb" position="0 0 0.05" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+          </a-entity>
+        </a-scene>
+      `;
+
+      for (let i = 0; i < 4; i++) {
+        const el = document.getElementById(`target-${i}`);
+        el.addEventListener("targetFound", () => {
+          document.getElementById("ar-status-badge").textContent = `Marker ${i + 1} Terdeteksi!`;
+          document.getElementById("ar-status-badge").style.color = "#34d399";
+          document.getElementById("ar-info-title").textContent = INFO_MARKER[i].judul;
+          document.getElementById("ar-info-desc").textContent = INFO_MARKER[i].deskripsi;
+        });
+        el.addEventListener("targetLost", () => {
+          document.getElementById("ar-status-badge").textContent = "Mencari Marker LKPD...";
+          document.getElementById("ar-status-badge").style.color = "#93c5fd";
+        });
+      }
+    }
+
+    function tutupModeAR() {
+      const sceneEl = document.querySelector("a-scene");
+      if (sceneEl && sceneEl.systems["mindar-image-system"]) {
+        sceneEl.systems["mindar-image-system"].stop();
+      }
+      document.getElementById("ar-container").innerHTML = "";
+      document.getElementById("screen-ar").classList.add("hidden");
+    }
+
+    // =========================================================================
+    // 5. LOGIKA KUIS PUSH RANK SISWA (KUNCI PER SOAL + ANTI-CURANG)
+    // =========================================================================
+    let studentInfo = { nama: "", absen: "", kelas: "" };
+    let listQuestions = [];
+    let currentIndex = 0;
+    let lockedAnswers = [];      // Jawaban yang sudah dikunci siswa ('A','B','C','D' atau null)
+    let tempSelected = [];       // Pilihan sementara sebelum menekan tombol Kunci
+    let isQuizSubmitted = false;
+    let lastKnownTierLevel = -1;
+    let isLeaderboardMinimized = true;
+    let globalLeaderboardCache = [];
+
+    async function mulaiKuisPushRank() {
+      const nama = document.getElementById("input-nama").value.trim();
+      const absen = document.getElementById("input-absen").value.trim();
+      const kelas = document.getElementById("input-kelas").value;
+
+      if (!nama || !absen || !kelas) {
+        alert("Harap lengkapi Nama Lengkap, Nomor Absen, dan Kelas terlebih dahulu!");
+        return;
+      }
+
+      studentInfo = { nama, absen, kelas };
+      const btn = document.getElementById("btn-mulai-kuis");
+      btn.disabled = true;
+      btn.innerText = "Memuat Arena Soal...";
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=getSoal`);
+        const json = await res.json();
+        if (json.status === "success" && json.data && json.data.length > 0) {
+          listQuestions = json.data;
+          currentIndex = 0;
+          lockedAnswers = new Array(listQuestions.length).fill(null);
+          tempSelected = new Array(listQuestions.length).fill(null);
+          isQuizSubmitted = false;
+          lastKnownTierLevel = -1;
+
+          sembunyikanSemuaLayar();
+          document.getElementById("btn-top-exit").classList.remove("hidden");
+          document.getElementById("submitted-notice-banner").classList.add("hidden");
+          document.getElementById("screen-exam").classList.remove("hidden");
+          document.getElementById("bottom-bar").classList.remove("hidden");
+
+          // Default leaderboard minimize
+          isLeaderboardMinimized = true;
+          document.getElementById("lb-expanded-area").classList.add("hidden");
+          document.getElementById("btn-toggle-lb").innerText = "▼ Lihat Top 5";
+
+          initGridNav();
+          perbaruiKartuBadgeSiswa(false);
+          renderSoal(0);
+          muatLiveLeaderboardSiswa();
+        } else {
+          alert("Belum ada soal tersedia di Spreadsheet.");
+        }
+      } catch (err) {
+        alert("Gagal terhubung ke server soal. Pastikan URL Web App Apps Script sudah benar.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "⚔️ MULAI PUSH RANK";
+      }
+    }
+
+    function hitungSkorLokal() {
+      if (!listQuestions.length) return { benar: 0, salah: 0, terkunci: 0, skor: 0 };
+      let benar = 0;
+      let terkunci = 0;
+      listQuestions.forEach((q, idx) => {
+        const ans = lockedAnswers[idx];
+        if (ans !== null && ans !== undefined) {
+          terkunci++;
+          if (ans === q.kunci) benar++;
+        }
+      });
+      const skor = Math.round((benar / listQuestions.length) * 100);
+      return { benar, salah: listQuestions.length - benar, terkunci, skor };
+    }
+
+    function perbaruiKartuBadgeSiswa(allowSplash) {
+      const stat = hitungSkorLokal();
+      const myTier = getTierInfoClient(stat.skor);
+
+      document.getElementById("player-identity-label").innerText = `${studentInfo.nama} • ${studentInfo.kelas}`;
+      const card = document.getElementById("player-rank-card");
+      card.style.borderColor = myTier.color;
+
+      const badgeBox = document.getElementById("player-badge-container");
+      badgeBox.innerHTML = myTier.logo
+        ? `<img src="${myTier.logo}" class="player-badge-img" style="filter: drop-shadow(0 0 12px ${myTier.color});" alt="${myTier.name}" />`
+        : `<div class="unranked-shield">🛡️</div>`;
+
+      const tierTitle = document.getElementById("player-tier-name");
+      tierTitle.innerText = myTier.name;
+      tierTitle.style.color = myTier.color;
+
+      document.getElementById("player-stars-container").innerHTML = buildStarsHtml(myTier.stars, myTier.maxStars);
+      document.getElementById("player-next-tier").innerText = (myTier.level === 10) ? "🔥 MAX TIER" : `Next: ${myTier.nextTier}`;
+
+      const pct = Math.round((stat.terkunci / listQuestions.length) * 100);
+      document.getElementById("disp-percent").innerText = `${pct}% (${stat.terkunci}/${listQuestions.length} Terkunci)`;
+      document.getElementById("progress-bar-fill").style.width = `${pct}%`;
+
+      if (lastKnownTierLevel === -1) {
+        lastKnownTierLevel = myTier.level;
+      } else if (allowSplash && myTier.level > lastKnownTierLevel) {
+        lastKnownTierLevel = myTier.level;
+        tampilkanModalRankUp(myTier);
+      } else {
+        lastKnownTierLevel = myTier.level;
+      }
+    }
+
+    function tampilkanModalRankUp(tier) {
+      document.getElementById("rankup-modal-img").src = tier.logo || "./icons/icon-192.png";
+      const nameEl = document.getElementById("rankup-modal-tiername");
+      nameEl.innerText = tier.name;
+      nameEl.style.color = tier.color;
+      nameEl.style.borderColor = tier.color;
+      document.getElementById("rankup-modal-stars").innerHTML = buildStarsHtml(tier.stars, tier.maxStars, "star-icon");
+      document.getElementById("rankup-splash-modal").classList.remove("hidden");
+      playFierceRankUpSound();
+    }
+
+    function tutupModalRankUp() {
+      document.getElementById("rankup-splash-modal").classList.add("hidden");
+    }
+
+    function toggleLeaderboardView() {
+      isLeaderboardMinimized = !isLeaderboardMinimized;
+      const area = document.getElementById("lb-expanded-area");
+      const btn = document.getElementById("btn-toggle-lb");
+      if (isLeaderboardMinimized) {
+        area.classList.add("hidden");
+        btn.innerText = "▼ Lihat Top 5";
+      } else {
+        area.classList.remove("hidden");
+        btn.innerText = "▲ Tutup";
+      }
+    }
+
+    async function muatLiveLeaderboardSiswa() {
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=getLeaderboard&kelas=ALL`);
+        const json = await res.json();
+        if (json.status === "success") {
+          globalLeaderboardCache = json.data || [];
+          renderLiveLeaderboardSiswa();
+        }
+      } catch (e) {}
+    }
+
+    function renderLiveLeaderboardSiswa() {
+      const filter = document.getElementById("lb-class-filter").value;
+      const list = (filter === "MY_CLASS")
+        ? globalLeaderboardCache.filter(item => item.kelas === studentInfo.kelas)
+        : globalLeaderboardCache;
+
+      const miniRank1 = document.getElementById("lb-mini-rank1");
+      const lbContent = document.getElementById("lb-content");
+
+      if (list.length === 0) {
+        miniRank1.innerHTML = `<span style="color:var(--gold-text); font-weight:900;">👑 #1:</span> <span style="color:var(--muted);">Belum ada peserta</span>`;
+        lbContent.innerHTML = `<div style="text-align:center; color:var(--muted); font-size:12px;">Belum ada data pengerjaan.</div>`;
+        return;
+      }
+
+      const top1 = list[0];
+      const t1Obj = getTierByNameClient(top1.tierName);
+      const t1Logo = t1Obj.logo ? `<img src="${t1Obj.logo}" style="width:15px; height:15px; object-fit:contain; vertical-align:middle; margin-right:3px;">` : "";
+      miniRank1.innerHTML = `<span style="color:var(--gold-text); font-weight:900;">👑 #1:</span> <b>${top1.nama}</b> <small style="color:var(--muted);">(${top1.kelas})</small> <span class="tier-badge" style="background:${t1Obj.color};">${t1Logo}${t1Obj.name}</span>`;
+
+      // Tampilkan Top 5 saat di-maximize
+      const top5 = list.slice(0, 5);
+      lbContent.innerHTML = top5.map((item, idx) => {
+        const tObj = getTierByNameClient(item.tierName);
+        const logoHtml = tObj.logo ? `<img src="${tObj.logo}" style="width:15px; height:15px; object-fit:contain;">` : "";
+        const rowCls = idx === 0 ? "top1" : (idx === 1 ? "top2" : (idx === 2 ? "top3" : ""));
+        return `
+          <div class="lb-row ${rowCls}">
+            <span>${idx + 1}. <b>${item.nama}</b> <small style="color:var(--muted);">(${item.kelas})</small></span>
+            <span class="tier-badge" style="background:${tObj.color};">${logoHtml}${tObj.name}</span>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSoal(index) {
+      currentIndex = index;
+      const q = listQuestions[index];
+      const isLocked = isQuizSubmitted || (lockedAnswers[index] !== null && lockedAnswers[index] !== undefined);
+
+      document.getElementById("disp-no").innerText = `SOAL ${index + 1}`;
+      document.getElementById("disp-progress").innerText = `Soal ${index + 1} dari ${listQuestions.length}`;
+
+      const badge = document.getElementById("disp-lock-badge");
+      if (isLocked) {
+        badge.innerHTML = `<span style="color:var(--success);">🔒 TERKUNCI</span>`;
+      } else if (tempSelected[index]) {
+        badge.innerHTML = `<span style="color:var(--gold-text);">⏳ BELUM DIKUNCI</span>`;
+      } else {
+        badge.innerHTML = `<span style="color:var(--muted);">BELUM DIJAWAB</span>`;
+      }
+
+      let htmlSoal = `<div>${q.pertanyaan}</div>`;
+      if (q.gambar && q.gambar.trim() !== "") {
+        htmlSoal += `<div style="text-align:center; margin:12px 0;"><img src="${q.gambar}" style="max-width:100%; max-height:260px; border-radius:12px; background:#fff; padding:4px;" alt="Gambar Soal" /></div>`;
+      }
+      document.getElementById("disp-soal").innerHTML = htmlSoal;
+
+      const opsis = [
+        { huruf: "A", teks: q.opsiA },
+        { huruf: "B", teks: q.opsiB },
+        { huruf: "C", teks: q.opsiC },
+        { huruf: "D", teks: q.opsiD }
+      ];
+      const activeChoice = isLocked ? lockedAnswers[index] : tempSelected[index];
+
+      let htmlOpts = "";
+      opsis.forEach(op => {
+        let cls = "";
+        let reviewTag = "";
+
+        if (isQuizSubmitted) {
+          // Mode Tinjau Pembahasan: tampilkan jawaban benar & salah siswa
+          if (op.huruf === q.kunci) {
+            cls = "selected-locked locked";
+            reviewTag = `<span style="color:var(--success); font-size:11px; font-weight:900; margin-left:8px;">(✔ Kunci Jawaban Benar)</span>`;
+          } else if (op.huruf === activeChoice && activeChoice !== q.kunci) {
+            cls = "review-wrong locked";
+            reviewTag = `<span style="color:var(--danger); font-size:11px; font-weight:900; margin-left:8px;">(✖ Jawaban Anda Salah)</span>`;
+          } else {
+            cls = "locked";
+          }
+        } else if (isLocked) {
+          // Saat ujian berlangsung & soal sudah dikunci: JANGAN bocorkan benar/salah!
+          cls = (activeChoice === op.huruf) ? "selected-locked locked" : "locked";
+        } else {
+          cls = (activeChoice === op.huruf) ? "selected-temp" : "";
+        }
+
+        const clickAttr = isLocked ? "" : `onclick="pilihOpsiSementara('${op.huruf}')"`;
+        htmlOpts += `
+          <div class="option-card ${cls}" ${clickAttr}>
+            <div class="option-indicator">${op.huruf}</div>
+            <div style="flex:1;">${op.teks}${reviewTag}</div>
+          </div>
+        `;
+      });
+      document.getElementById("disp-options").innerHTML = htmlOpts;
+
+      const lockArea = document.getElementById("lock-action-area");
+      if (isLocked) {
+        lockArea.innerHTML = `<div class="locked-status-pill">✅ Jawaban (${activeChoice || "Kosong"}) Telah Dikunci</div>`;
+      } else if (tempSelected[index]) {
+        lockArea.innerHTML = `<button type="button" class="btn-lock-answer" onclick="kunciJawabanSoalIni()">🔒 KUNCI &amp; KIRIM JAWABAN (${tempSelected[index]})</button>`;
+      } else {
+        lockArea.innerHTML = `<button type="button" class="btn-lock-answer" disabled>🔒 Pilih Opsi Dahulu Untuk Mengunci Jawaban</button>`;
+      }
+
+      document.getElementById("btn-prev").disabled = (index === 0);
+      const btnNext = document.getElementById("btn-next");
+      if (index === listQuestions.length - 1) {
+        btnNext.innerText = isQuizSubmitted ? "Ke Kartu Hasil" : "Cek & Kirim Final";
+        btnNext.className = "btn btn-success";
+      } else {
+        btnNext.innerText = "Next";
+        btnNext.className = "btn btn-primary";
+      }
+
+      updateNavGridStatus();
+      if (window.MathJax) MathJax.typesetPromise().catch(() => {});
+    }
+
+    function pilihOpsiSementara(huruf) {
+      if (isQuizSubmitted || lockedAnswers[currentIndex] !== null) return;
+      tempSelected[currentIndex] = huruf;
+      renderSoal(currentIndex);
+    }
+
+    async function kunciJawabanSoalIni() {
+      if (isQuizSubmitted || lockedAnswers[currentIndex] !== null) return;
+      const chosen = tempSelected[currentIndex];
+      if (!chosen) return;
+
+      lockedAnswers[currentIndex] = chosen;
+      playLockClickSound();
+      renderSoal(currentIndex);
+      perbaruiKartuBadgeSiswa(true);
+
+      // Sinkronkan progres secara real-time ke server agar proyektor guru langsung ter-update
+      const stat = hitungSkorLokal();
+      const tier = getTierInfoClient(stat.skor);
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "syncProgress",
+            nama: studentInfo.nama,
+            absen: studentInfo.absen,
+            kelas: studentInfo.kelas,
+            skor: stat.skor,
+            benar: stat.benar,
+            salah: stat.salah,
+            total: listQuestions.length,
+            terkunci: stat.terkunci,
+            tierName: tier.name,
+            status: "LIVE"
+          })
+        });
+        const json = await res.json();
+        if (json.status === "success" && json.data && json.data.leaderboard) {
+          globalLeaderboardCache = json.data.leaderboard;
+          renderLiveLeaderboardSiswa();
+        }
+      } catch (e) {}
+    }
+
+    function initGridNav() {
+      const container = document.getElementById("grid-container");
+      container.innerHTML = listQuestions.map((_, i) => `<div id="num-btn-${i}" class="num-btn" onclick="jumpToSoal(${i})">${i + 1}</div>`).join("");
+    }
+
+    function updateNavGridStatus() {
+      listQuestions.forEach((_, i) => {
+        const btn = document.getElementById(`num-btn-${i}`);
+        if (!btn) return;
+        btn.className = "num-btn";
+        if (i === currentIndex) btn.classList.add("active");
+        else if (lockedAnswers[i] !== null) btn.classList.add("done");
+        else if (tempSelected[i] !== null) btn.classList.add("draft-picked");
+      });
+    }
+
+    function toggleGrid() { document.getElementById("grid-container").classList.toggle("hidden"); }
+    function jumpToSoal(i) { renderSoal(i); document.getElementById("grid-container").classList.add("hidden"); }
+    function prevSoal() { if (currentIndex > 0) renderSoal(currentIndex - 1); }
+    function nextSoal() {
+      if (currentIndex < listQuestions.length - 1) {
+        renderSoal(currentIndex + 1);
+      } else if (isQuizSubmitted) {
+        kembaliKeKartuHasil();
+      } else {
+        bukaHalamanReview();
+      }
+    }
+
+    function bukaHalamanReview() {
+      sembunyikanSemuaLayar();
+      document.getElementById("screen-review").classList.remove("hidden");
+      const container = document.getElementById("review-grid-container");
+      let unlockedCount = 0;
+
+      container.innerHTML = listQuestions.map((_, i) => {
+        let cls = "num-btn";
+        if (lockedAnswers[i] !== null) cls += " done";
+        else {
+          unlockedCount++;
+          if (tempSelected[i] !== null) cls += " draft-picked";
+        }
+        return `<div class="${cls}" onclick="kembaliKeSoalNomor(${i})">${i + 1}</div>`;
+      }).join("");
+
+      const warn = document.getElementById("unlocked-warning-box");
+      if (unlockedCount > 0) {
+        warn.classList.remove("hidden");
+        warn.innerText = `⚠️ Masih ada ${unlockedCount} soal belum dikunci! Klik nomor yang belum hijau untuk mengunci jawaban.`;
+      } else {
+        warn.classList.add("hidden");
+      }
+    }
+
+    function kembaliKeUjian() {
+      sembunyikanSemuaLayar();
+      document.getElementById("screen-exam").classList.remove("hidden");
+      document.getElementById("bottom-bar").classList.remove("hidden");
+    }
+
+    function kembaliKeSoalNomor(i) {
+      kembaliKeUjian();
+      renderSoal(i);
+    }
+
+    function konfirmasiKeluarKuis() {
+      if (confirm("Keluar dari kuis dan kembali ke beranda?")) {
+        kembaliKeBeranda();
+      }
+    }
+
+    // =========================================================================
+    // 6. KIRIM JAWABAN FINAL & BATTLE RESULT CARD
+    // =========================================================================
+    async function konfirmasiKirimFinal() {
+      const unlocked = lockedAnswers.filter(a => a === null).length;
+      const pesan = unlocked > 0
+        ? `PERHATIAN: Masih ada ${unlocked} soal yang BELUM DIKUNCI (dianggap salah).\n\nTetap kirim jawaban final sekarang?`
+        : "Yakin ingin mengirim jawaban final dan melihat hasil akhir?";
+      if (!confirm(pesan)) return;
+
+      const btn = document.getElementById("btn-submit-final");
+      btn.disabled = true;
+      btn.innerText = "Mengirim Hasil...";
+
+      const stat = hitungSkorLokal();
+      const tier = getTierInfoClient(stat.skor);
+      isQuizSubmitted = true;
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "syncProgress",
+            nama: studentInfo.nama,
+            absen: studentInfo.absen,
+            kelas: studentInfo.kelas,
+            skor: stat.skor,
+            benar: stat.benar,
+            salah: stat.salah,
+            total: listQuestions.length,
+            terkunci: stat.terkunci,
+            tierName: tier.name,
+            status: "FINAL"
+          })
+        });
+        const json = await res.json();
+        if (json.status === "success" && json.data && json.data.leaderboard) {
+          globalLeaderboardCache = json.data.leaderboard;
+        }
+      } catch (e) {}
+
+      btn.disabled = false;
+      btn.innerText = "Kirim Jawaban Final";
+
+      // Siapkan banner mode tinjau
+      const logoMini = tier.logo ? `<img src="${tier.logo}" style="width:16px; height:16px; object-fit:contain; vertical-align:middle; margin-right:4px;">` : "";
+      document.getElementById("submitted-stats-summary").innerHTML =
+        `Tier: <span class="tier-badge" style="background:${tier.color};">${logoMini}${tier.name}</span> | <b>${stat.benar} Benar</b> • <b>${stat.salah} Salah</b> (${stat.skor} Pts)`;
+
+      tampilkanKartuHasilAkhir(stat, tier);
+    }
+
+    function tampilkanKartuHasilAkhir(stat, tier) {
+      sembunyikanSemuaLayar();
+      document.getElementById("screen-result").classList.remove("hidden");
+
+      const kelasList = globalLeaderboardCache.filter(item => item.kelas === studentInfo.kelas);
+      const myIdx = kelasList.findIndex(item => item.nama.toLowerCase() === studentInfo.nama.toLowerCase() && item.absen === studentInfo.absen);
+      const myRank = myIdx >= 0 ? myIdx + 1 : 1;
+
+      document.getElementById("victory-student-name").innerText = studentInfo.nama;
+      document.getElementById("victory-student-sub").innerText = `Kelas ${studentInfo.kelas} • Absen ${studentInfo.absen}`;
+      document.getElementById("victory-achievement-title").innerText = getAchievementTitleClient(stat.skor);
+
+      document.getElementById("final-my-rank").innerText = `#${myRank}`;
+      document.getElementById("final-rank-sub").innerText = `dari ${Math.max(1, kelasList.length)} Siswa`;
+      document.getElementById("final-my-nilai").innerText = `${stat.skor} Pts`;
+      document.getElementById("final-score-sub").innerText = `Akurasi ${stat.skor}%`;
+
+      const snapCard = document.getElementById("victory-snapshot-card");
+      snapCard.style.borderColor = tier.color;
+      document.getElementById("victory-pedestal-box").style.borderColor = tier.color;
+      document.getElementById("victory-badge-holder").innerHTML = tier.logo
+        ? `<img src="${tier.logo}" class="victory-badge-img" alt="${tier.name}" />`
+        : `<div style="font-size:44px;">🛡️</div>`;
+
+      const ribbon = document.getElementById("victory-tier-name");
+      ribbon.innerText = tier.name;
+      ribbon.style.color = tier.color;
+      ribbon.style.borderColor = tier.color;
+      document.getElementById("victory-stars-row").innerHTML = buildStarsHtml(tier.stars, tier.maxStars, "star-icon victory-star-item");
+
+      // Keterangan Benar & Salah Siswa
+      document.getElementById("final-hit-text").innerText = `✔ ${stat.benar} BENAR`;
+      document.getElementById("final-miss-text").innerText = `${stat.salah} SALAH ✖`;
+      document.getElementById("final-accuracy-badge").innerText = `${stat.skor}% WIN RATE`;
+      document.getElementById("combat-bar-hit").style.width = `${stat.skor}%`;
+      document.getElementById("combat-bar-miss").style.width = `${100 - stat.skor}%`;
+
+      // Mini Podium Top 3 Kelas
+      document.getElementById("in-card-podium-title").innerText = `🏆 TOP 3 KLASEMEN KELAS ${studentInfo.kelas}`;
+      const medals = ["🥇", "🥈", "🥉"];
+      let podiumHtml = "";
+      for (let i = 0; i < 3; i++) {
+        const item = kelasList[i];
+        if (item) {
+          const tObj = getTierByNameClient(item.tierName);
+          const lMini = tObj.logo ? `<img src="${tObj.logo}" style="width:14px; height:14px; object-fit:contain;">` : "";
+          podiumHtml += `
+            <div class="mini-podium-row ${i === 0 ? 'mp-1' : ''}">
+              <div class="mini-podium-name">${medals[i]} ${item.nama}</div>
+              <div><span class="tier-badge" style="background:${tObj.color}; font-size:9.5px;">${lMini}${tObj.name}</span></div>
+            </div>
+          `;
+        } else {
+          podiumHtml += `
+            <div class="mini-podium-row" style="opacity:0.5;">
+              <div class="mini-podium-name" style="font-style:italic; color:var(--muted);">${medals[i]} Menunggu peserta...</div>
+              <div><span class="tier-badge" style="background:var(--border); color:var(--muted); font-size:9px;">UNRANKED</span></div>
+            </div>
+          `;
+        }
+      }
+      document.getElementById("in-card-top3-list").innerHTML = podiumHtml;
+
+      renderTop10Hasil();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderTop10Hasil() {
+      const filter = document.getElementById("result-lb-class-filter").value;
+      const list = (filter === "MY_CLASS")
+        ? globalLeaderboardCache.filter(item => item.kelas === studentInfo.kelas)
+        : globalLeaderboardCache;
+      const top10 = list.slice(0, 10);
+      const container = document.getElementById("final-lb-container");
+
+      if (top10.length === 0) {
+        container.innerHTML = `<div style="padding:14px; text-align:center; color:var(--muted); font-size:12px;">Belum ada data klasemen.</div>`;
+        return;
+      }
+
+      container.innerHTML = top10.map((item, idx) => {
+        const tObj = getTierByNameClient(item.tierName);
+        const lMini = tObj.logo ? `<img src="${tObj.logo}" style="width:15px; height:15px; object-fit:contain;">` : "";
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border); font-size:13px;">
+            <div style="flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+              ${idx + 1}. <b>${item.nama}</b> <small style="color:var(--muted);">(${item.kelas})</small>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+              <span class="tier-badge" style="background:${tObj.color};">${lMini}${tObj.name}</span>
+              <b style="color:var(--success); font-size:12px;">${item.skor} Pts</b>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function bukaModeTinjauSoal() {
+      sembunyikanSemuaLayar();
+      document.getElementById("submitted-notice-banner").classList.remove("hidden");
+      document.getElementById("screen-exam").classList.remove("hidden");
+      document.getElementById("bottom-bar").classList.remove("hidden");
+      renderSoal(0);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function kembaliKeKartuHasil() {
+      sembunyikanSemuaLayar();
+      document.getElementById("screen-result").classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // =========================================================================
+    // 7. MODE PROYEKTOR GURU (ANIMASI FLIP) & KELOLA SOAL
+    // =========================================================================
+    let guruPinCache = "";
+    let projectorInterval = null;
+    let lastProjectorContextKey = "";
+
+    async function bukaModalGuru() {
+      const pin = prompt("Masukkan PIN Guru untuk Membuka Mode Proyektor & Kelola Soal:");
+      if (!pin) return;
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "verifyTeacher", pin })
+        });
+        const json = await res.json();
+        if (json.ok) {
+          guruPinCache = pin;
+          masukModeProyektor();
+        } else {
+          alert("PIN Guru Salah!");
+        }
+      } catch (e) {
+        alert("Gagal memverifikasi PIN Guru.");
+      }
+    }
+
+    function masukModeProyektor() {
+      document.getElementById("main-app-container").classList.add("hidden");
+      document.getElementById("bottom-bar").classList.add("hidden");
+      document.getElementById("screen-projector").classList.remove("hidden");
+
+      lastProjectorContextKey = "";
+      updateDataProyektor(false);
+
+      if (projectorInterval) clearInterval(projectorInterval);
+      projectorInterval = setInterval(() => updateDataProyektor(true), 10000);
+    }
+
+    function tutupModeProyektor() {
+      if (projectorInterval) {
+        clearInterval(projectorInterval);
+        projectorInterval = null;
+      }
+      document.getElementById("screen-projector").classList.add("hidden");
+      document.getElementById("main-app-container").classList.remove("hidden");
+    }
+
+    function switchGuruTab(tabId) {
+      document.getElementById("tab-proj-board").classList.add("hidden");
+      document.getElementById("tab-proj-soal").classList.add("hidden");
+      document.getElementById(tabId).classList.remove("hidden");
+    }
+
+    async function updateDataProyektor(isAuto) {
+      const kelas = document.getElementById("proj-sel-kelas").value;
+      const limit = parseInt(document.getElementById("proj-sel-limit").value, 10);
+      const hideScore = document.getElementById("proj-hide-score").checked;
+      const btn = document.getElementById("btn-proj-update");
+
+      if (!isAuto && btn) {
+        btn.innerText = "Updating...";
+        btn.disabled = true;
+      }
+
+      try {
+        const res = await fetch(`${GAS_API_URL}?action=getLeaderboard&kelas=${encodeURIComponent(kelas)}`);
+        const json = await res.json();
+        if (json.status !== "success") return;
+
+        const fullList = json.data || [];
+        const topList = (limit > 0) ? fullList.slice(0, limit) : fullList;
+
+        document.getElementById("proj-stat-summary").innerText =
+          `Total Peserta: ${fullList.length} Siswa | Menampilkan Top ${topList.length} (Auto Sync 10d)`;
+
+        const container = document.getElementById("proj-board-container");
+        if (topList.length === 0) {
+          lastProjectorContextKey = "";
+          container.innerHTML = `<div style="text-align:center; color:var(--muted); padding:30px;">Belum ada data pengerjaan pada filter ini.</div>`;
+          return;
+        }
+
+        const contextKey = `${kelas}|${limit}`;
+        const isSameContext = (lastProjectorContextKey === contextKey);
+        const oldPositions = {};
+        const oldRanks = {};
+        let hadPreviousRows = false;
+
+        if (isSameContext) {
+          container.querySelectorAll(".proj-row[data-student-key]").forEach(rowEl => {
+            const k = rowEl.getAttribute("data-student-key");
+            if (k) {
+              oldPositions[k] = rowEl.getBoundingClientRect().top;
+              oldRanks[k] = parseInt(rowEl.getAttribute("data-rank"), 10);
+              hadPreviousRows = true;
+            }
+          });
+        }
+        lastProjectorContextKey = contextKey;
+
+        let html = "";
+        topList.forEach(item => {
+          const studentKey = item.key;
+          const topClass = item.rank === 1 ? "p-top1" : (item.rank === 2 ? "p-top2" : (item.rank === 3 ? "p-top3" : ""));
+          let moveClass = "";
+          let deltaBadge = "";
+
+          if (hadPreviousRows) {
+            if (oldRanks[studentKey] !== undefined) {
+              const diff = oldRanks[studentKey] - item.rank;
+              if (diff > 0) {
+                moveClass = "proj-row-promoted";
+                deltaBadge = `<span class="rank-delta-badge rank-delta-up">▲ +${diff}</span>`;
+              } else if (diff < 0) {
+                deltaBadge = `<span class="rank-delta-badge rank-delta-down">▼ ${diff}</span>`;
+              }
+            } else {
+              deltaBadge = `<span class="rank-delta-badge rank-delta-new">★ BARU</span>`;
+            }
+          }
+
+          const tObj = getTierByNameClient(item.tierName);
+          const logoImg = tObj.logo ? `<img src="${tObj.logo}" style="width:20px; height:20px; object-fit:contain; vertical-align:middle; margin-right:5px;">` : "";
+          const tierBadge = `<span class="tier-badge" style="background:${tObj.color}; font-size:11px; padding:3px 8px;">${logoImg}${tObj.name}</span>`;
+
+          const statusLabel = item.status === "FINAL" ? "✅ Selesai" : `⏳ Progres (${item.terkunci}/${item.total})`;
+          const dispBenar = hideScore ? "***" : `${item.benar} <span style="font-size:13px; font-weight:700;">Benar</span>`;
+          const dispPts = hideScore ? "Skor Disembunyikan" : `${item.skor} Pts`;
+
+          html += `
+            <div class="proj-row ${topClass} ${moveClass}" data-student-key="${studentKey}" data-rank="${item.rank}">
+              <div style="display:flex; align-items:center;">
+                <div style="font-weight:900; font-size:18px; width:38px; color:var(--gold-text);">${item.rank}.</div>
+                <div>
+                  <div style="font-weight:800; font-size:16px;">${item.nama} ${tierBadge}${deltaBadge}</div>
+                  <div style="font-size:11.5px; color:var(--muted);">Kelas ${item.kelas} • Absen ${item.absen} • ${statusLabel}</div>
+                </div>
+              </div>
+              <div style="text-align:right;">
+                <div style="font-size:20px; font-weight:900; color:var(--success);">${dispBenar}</div>
+                <div style="font-size:11.5px; font-weight:700; color:var(--score-text);">${dispPts}</div>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML = html;
+
+        // FLIP Animation untuk baris yang bertukar posisi
+        if (hadPreviousRows) {
+          const rowsToAnimate = [];
+          container.querySelectorAll(".proj-row[data-student-key]").forEach(newRow => {
+            const k = newRow.getAttribute("data-student-key");
+            if (oldPositions[k] !== undefined) {
+              const deltaY = oldPositions[k] - newRow.getBoundingClientRect().top;
+              if (Math.abs(deltaY) > 2) {
+                newRow.style.transition = "none";
+                newRow.style.transform = `translate3d(0, ${deltaY}px, 0)`;
+                rowsToAnimate.push(newRow);
+              }
+            }
+          });
+          if (rowsToAnimate.length > 0) {
+            void container.offsetHeight;
+            requestAnimationFrame(() => {
+              rowsToAnimate.forEach(r => {
+                r.style.transition = "transform 0.75s cubic-bezier(0.22, 1, 0.36, 1)";
+                r.style.transform = "translate3d(0, 0, 0)";
+              });
+            });
+          }
+        }
+      } catch (e) {} finally {
+        if (!isAuto && btn) {
+          btn.innerText = "Update Data";
+          btn.disabled = false;
+        }
+      }
+    }
+
+    async function simpanSoalBaruGuru() {
+      const pertanyaan = document.getElementById("admin-pertanyaan").value.trim();
+      const opsiA = document.getElementById("admin-a").value.trim();
+      const opsiB = document.getElementById("admin-b").value.trim();
+      const opsiC = document.getElementById("admin-c").value.trim();
+      const opsiD = document.getElementById("admin-d").value.trim();
+      const kunci = document.getElementById("admin-kunci").value;
+      const fileInput = document.getElementById("admin-gambar");
+
+      if (!pertanyaan || !opsiA || !opsiB || !opsiC || !opsiD) {
+        alert("Harap isi pertanyaan dan seluruh pilihan jawaban A–D!");
+        return;
+      }
+
+      const btn = document.getElementById("btn-simpan-soal");
+      btn.disabled = true;
+      btn.innerText = "Mengunggah Soal...";
+
+      let gambarBase64 = "";
+      let gambarMime = "";
+      if (fileInput.files && fileInput.files[0]) {
+        const file = fileInput.files[0];
+        gambarMime = file.type;
+        gambarBase64 = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result.split(",")[1]);
+          r.onerror = reject;
+          r.readAsDataURL(file);
+        });
+      }
+
+      try {
+        const res = await fetch(GAS_API_URL, {
+          method: "POST",
+          body: JSON.stringify({
+            action: "tambahSoal",
+            pin: guruPinCache,
+            pertanyaan,
+            gambarBase64,
+            gambarMime,
+            opsiA,
+            opsiB,
+            opsiC,
+            opsiD,
+            kunci
+          })
+        });
+        const json = await res.json();
+        if (json.status === "success") {
+          alert("Soal berhasil disimpan ke Spreadsheet!");
+          document.getElementById("admin-pertanyaan").value = "";
+          document.getElementById("admin-a").value = "";
+          document.getElementById("admin-b").value = "";
+          document.getElementById("admin-c").value = "";
+          document.getElementById("admin-d").value = "";
+          fileInput.value = "";
+        } else {
+          alert("Gagal: " + json.message);
+        }
+      } catch (e) {
+        alert("Terjadi kesalahan jaringan saat mengunggah soal.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "💾 Simpan Soal ke Spreadsheet";
+      }
+    }
+  </script>
+</body>
+</html>
