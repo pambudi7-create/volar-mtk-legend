@@ -105,7 +105,7 @@
     }
 
     /* ===================================================================== */
-    /* APP BAR ATAS (LOGO UTUH ANTI-TERPOTONG)                               */
+    /* APP BAR ATAS (LOGO UTUH TRANSPARAN)                                   */
     /* ===================================================================== */
     .app-bar {
       position: sticky; top: 0; background: var(--header-bg); color: white;
@@ -115,7 +115,7 @@
 
     .app-title-container { display: flex; align-items: center; gap: 9px; cursor: pointer; min-width: 0; }
     .app-logo {
-      height: 36px; width: auto; max-width: 72px;
+      height: 36px; width: auto; max-width: 96px;
       object-fit: contain; border-radius: 0; flex-shrink: 0;
       filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.55));
     }
@@ -179,8 +179,8 @@
       content: "";
       position: absolute;
       top: -60px; left: 50%; transform: translateX(-50%);
-      width: 260px; height: 150px;
-      background: radial-gradient(circle, rgba(251, 191, 36, 0.24) 0%, transparent 72%);
+      width: 280px; height: 160px;
+      background: radial-gradient(circle, rgba(251, 191, 36, 0.22) 0%, transparent 72%);
       pointer-events: none;
     }
 
@@ -192,14 +192,14 @@
     }
 
     .hero-emblem-img {
-      height: 122px;
+      height: 132px;
       width: auto;
       max-width: 92%;
       object-fit: contain;
       border-radius: 0;
       display: block;
       margin: 0 auto;
-      filter: drop-shadow(0 8px 20px rgba(251, 191, 36, 0.42));
+      filter: drop-shadow(0 8px 22px rgba(251, 191, 36, 0.45));
       animation: emblemFloat 3.2s ease-in-out infinite;
     }
 
@@ -765,7 +765,7 @@
     /* ===================================================================== */
     .proj-container { max-width: 1040px; margin: 0 auto; padding: 12px; }
     .proj-hero-header { text-align: center; margin-bottom: 16px; }
-    .proj-hero-logo { height: 92px; width: auto; max-width: 240px; object-fit: contain; border-radius: 0; }
+    .proj-hero-logo { height: 96px; width: auto; max-width: 260px; object-fit: contain; border-radius: 0; }
     .proj-hero-title { font-size: 26px; font-weight: 900; color: var(--gold-text); letter-spacing: 1.5px; margin-top: 6px; }
     .proj-row {
       display: flex; justify-content: space-between; align-items: center;
@@ -809,11 +809,11 @@
     <button type="button" class="btn-rankup-close" onclick="tutupModalRankUp()">⚔️ LANJUT PUSH RANK</button>
   </div>
 
-  <!-- MODAL INFORMASI APLIKASI & PENGEMBANG -->
+  <!-- MODAL INFORMASI APLIKASI & PENGEMBANG (BEBAS BOCORAN RUMUS) -->
   <div id="modal-info" class="modal-backdrop hidden" onclick="tutupModalInfo()">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div style="text-align:center; margin-bottom:14px;">
-        <img src="./icons/icon-512.png" style="height:82px; width:auto; max-width:220px; object-fit:contain; border-radius:0;" alt="Logo VOLAR" />
+        <img src="./icons/logo-utuh.png" style="height:86px; width:auto; max-width:230px; object-fit:contain; border-radius:0;" alt="Logo VOLAR" />
         <h2 style="margin:8px 0 2px 0; font-size:19px; color:var(--gold-text); font-weight:900;">VOLAR MTK LEGEND</h2>
         <div style="font-size:12px; font-weight:700; color:var(--score-text);">Media Pembelajaran Matematika Berbasis Augmented Reality</div>
       </div>
@@ -821,12 +821,9 @@
       <p style="font-size:13px; line-height:1.55; color:var(--text); margin-bottom:10px;">
         <b>VOLAR MTK LEGEND</b> merupakan media pembelajaran matematika berbasis Augmented Reality (AR) yang mengajak peserta didik mengeksplorasi berbagai jenis prisma dan menemukan konsep volume secara mandiri melalui visualisasi 3D interaktif.
       </p>
-      <p style="font-size:13px; line-height:1.55; color:var(--text); margin-bottom:12px;">
-        Media ini mencakup eksplorasi berbagai jenis prisma, mulai dari prisma segiempat, prisma segitiga, hingga prisma dengan bentuk alas berupa poligon lainnya. Pembelajaran dirancang agar peserta didik tidak sekadar menghafalkan rumus, tetapi memahami bagaimana rumus tersebut terbentuk melalui proses penemuan konsep, hingga memperoleh generalisasi bahwa:
+      <p style="font-size:13px; line-height:1.55; color:var(--text); margin-bottom:16px;">
+        Media ini mencakup eksplorasi berbagai jenis prisma, mulai dari prisma segiempat, prisma segitiga, hingga prisma dengan bentuk alas berupa poligon lainnya. Pembelajaran dirancang agar peserta didik tidak sekadar menghafalkan rumus, tetapi memahami bagaimana konsep volume tersebut terbentuk melalui pengamatan bangun ruang 3D dan aktivitas penemuan pada LKPD.
       </p>
-      <div style="background:var(--surface); border:1.5px solid var(--gold); border-radius:12px; padding:10px; text-align:center; font-weight:900; color:var(--gold-text); font-size:14px; margin-bottom:16px;">
-        Volume Prisma = Luas Alas × Tinggi Prisma
-      </div>
 
       <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px; margin-bottom:8px;">PENGEMBANG</div>
       <div class="dev-profile-card">
@@ -845,7 +842,7 @@
 
       <div style="font-size:11.5px; font-weight:900; color:var(--gold-text); letter-spacing:0.6px; margin-bottom:6px;">KONTAK</div>
       <div style="font-size:12.5px; color:var(--text); line-height:1.6; margin-bottom:14px;">
-        <div>📧 Email: <b>pambudi.7@gmail.com</b></div>
+        <div>📧 Email: <b>puguh.sri2@guru.smp.belajar.id</b></div>
         <div>📱 Instagram &amp; TikTok: <b>@puguh.pambudi_</b></div>
       </div>
 
@@ -860,7 +857,7 @@
   <!-- APP BAR ATAS -->
   <div class="app-bar">
     <div class="app-title-container" onclick="kembaliKeBeranda()">
-      <img src="./icons/icon-192.png" class="app-logo" alt="Logo VOLAR" />
+      <img src="./icons/logo-utuh.png" class="app-logo" alt="Logo VOLAR" />
       <div class="app-title">VOLAR - MTK Legend</div>
       <span class="btn-lock-secret" onclick="event.stopPropagation(); bukaModalGuru();" title="Mode Proyektor & Guru">🔒</span>
     </div>
@@ -880,7 +877,7 @@
     <div id="screen-home">
       <div class="lobby-hero-card">
         <div class="hero-emblem-wrap">
-          <img src="./icons/icon-512.png" class="hero-emblem-img" alt="VOLAR MTK Legend" />
+          <img src="./icons/logo-utuh.png" class="hero-emblem-img" alt="VOLAR MTK Legend" />
           <div class="hero-tagline">⚡ Interactive 3D AR Learning Arena</div>
           <div class="hero-subtitle">
             Jelajahi bangun ruang prisma 3D di atas LKPD-mu, temukan konsep volumenya secara mandiri, dan kejar rank tertinggi!
@@ -960,7 +957,7 @@
     <!-- 2. FORM IDENTITAS PUSH RANK (TANPA SSO) -->
     <div id="screen-login" class="card hidden">
       <div style="text-align:center; margin-bottom:14px;">
-        <img src="./icons/icon-512.png" style="height:78px; width:auto; max-width:210px; object-fit:contain; border-radius:0;" alt="Logo VOLAR" />
+        <img src="./icons/logo-utuh.png" style="height:82px; width:auto; max-width:220px; object-fit:contain; border-radius:0;" alt="Logo VOLAR" />
         <h3 style="margin:8px 0 2px 0; color:var(--gold-text); font-size:18px; font-weight:900;">PERSIAPAN PUSH RANK</h3>
         <div style="font-size:12px; color:var(--muted);">Isi identitasmu sebelum memasuki arena kuis</div>
       </div>
@@ -1181,7 +1178,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- LAYAR KAMERA WEBAR (MINDAR 4 MARKER + ALAS SOLID + SCAFFOLDING)       -->
+  <!-- LAYAR KAMERA WEBAR (MINDAR 4 MARKER + ANTI-JITTER + SCAFFOLDING)      -->
   <!-- ===================================================================== -->
   <div id="screen-ar" class="hidden">
     <div class="ar-hud-top">
@@ -1202,7 +1199,7 @@
   <div id="screen-projector" class="proj-container hidden">
     <div class="card">
       <div class="proj-hero-header">
-        <img src="./icons/icon-512.png" class="proj-hero-logo" alt="Logo VOLAR" />
+        <img src="./icons/logo-utuh.png" class="proj-hero-logo" alt="Logo VOLAR" />
         <div class="proj-hero-title">LIVE RANK • VOLAR - MTK LEGEND</div>
         <div id="proj-stat-summary" style="font-size:13px; color:var(--muted); margin-top:4px;">Total Peserta: 0 Siswa</div>
       </div>
@@ -1287,7 +1284,7 @@
 
   <script>
     // =========================================================================
-    // 1. KONFIGURASI URL WEB APP APPS SCRIPT (SUDAH TERPASANG)
+    // 1. KONFIGURASI URL WEB APP APPS SCRIPT
     // =========================================================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx00KuVvhr4PGQ2jf17mP-8iEJCgdTbvJiqjbnPmLkXbIFFZUt9hStRUYJxwRGT2Ech/exec";
 
@@ -1437,7 +1434,7 @@
     }
 
     // =========================================================================
-    // 4. NAVIGASI LAYAR UTAMA & WEBAR (ALAS SOLID + ANTI-JITTER + SCAFFOLDING)
+    // 4. NAVIGASI LAYAR UTAMA & WEBAR (BERSIH TANPA PANGGUNG + ANTI-JITTER)
     // =========================================================================
     function sembunyikanSemuaLayar() {
       ["screen-home", "screen-login", "screen-exam", "screen-review", "screen-result"].forEach(id => {
@@ -1483,36 +1480,6 @@
         pertanyaan: "Perhatikan pembagian alas segilima tersebut! Terbagi menjadi berapa prisma segitiga kecil? Jika volume tiap bagian dijumlahkan, pola hubungan apa yang muncul antara luas alas gabungan dan tingginya?"
       }
     ];
-
-    function buatMarkupPanggung(rimColor) {
-      return `
-        <!-- Alas panggung solid gelap untuk menutup tulisan marker di belakang objek semi-transparan -->
-        <a-cylinder
-          radius="0.48"
-          height="0.024"
-          segments-radial="48"
-          position="0 0.012 0"
-          material="color: #0b1120; roughness: 0.92; metalness: 0.15; opacity: 1;">
-        </a-cylinder>
-        <!-- Piringan dalam halus -->
-        <a-cylinder
-          radius="0.43"
-          height="0.026"
-          segments-radial="48"
-          position="0 0.013 0"
-          material="color: #162038; roughness: 0.85; metalness: 0.2; opacity: 1;">
-        </a-cylinder>
-        <!-- Cincin tepi bercahaya -->
-        <a-torus
-          radius="0.48"
-          radius-tubular="0.008"
-          segments-tubular="48"
-          rotation="90 0 0"
-          position="0 0.024 0"
-          material="color: ${rimColor}; emissive: ${rimColor}; emissiveIntensity: 0.9; roughness: 0.2;">
-        </a-torus>
-      `;
-    }
 
     function bukaModeAR() {
       document.getElementById("screen-ar").classList.remove("hidden");
@@ -1563,34 +1530,22 @@
 
           <!-- MARKER 1: Kubus Satuan -->
           <a-entity id="target-0" mindar-image-target="targetIndex: 0">
-            <a-entity rotation="90 0 0" position="0 0 0.01">
-              ${buatMarkupPanggung("#38bdf8")}
-              <a-gltf-model src="./models/m1_kubus.glb" position="0 0.03 0" scale="0.28 0.28 0.28" smooth-anim></a-gltf-model>
-            </a-entity>
+            <a-gltf-model src="./models/m1_kubus.glb" position="0 0 0.02" rotation="90 0 0" scale="0.28 0.28 0.28" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 2: Balok 3x4x3 -->
           <a-entity id="target-1" mindar-image-target="targetIndex: 1">
-            <a-entity rotation="90 0 0" position="0 0 0.01">
-              ${buatMarkupPanggung("#10b981")}
-              <a-gltf-model src="./models/m2_balok.glb" position="0 0.03 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
-            </a-entity>
+            <a-gltf-model src="./models/m2_balok.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 3: Prisma Segitiga -->
           <a-entity id="target-2" mindar-image-target="targetIndex: 2">
-            <a-entity rotation="90 0 0" position="0 0 0.01">
-              ${buatMarkupPanggung("#fbbf24")}
-              <a-gltf-model src="./models/m3_prisma3.glb" position="0 0.03 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
-            </a-entity>
+            <a-gltf-model src="./models/m3_prisma3.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 4: Prisma Segilima -->
           <a-entity id="target-3" mindar-image-target="targetIndex: 3">
-            <a-entity rotation="90 0 0" position="0 0 0.01">
-              ${buatMarkupPanggung("#a855f7")}
-              <a-gltf-model src="./models/m4_prisma5.glb" position="0 0.03 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
-            </a-entity>
+            <a-gltf-model src="./models/m4_prisma5.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
           </a-entity>
         </a-scene>
       `;
@@ -1616,7 +1571,6 @@
       if (sceneEl && sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
         try { sceneEl.systems["mindar-image-system"].stop(); } catch (e) {}
       }
-      // Hentikan stream video kamera agar lampu kamera mati bersih
       document.querySelectorAll("video").forEach(v => {
         if (v.srcObject) {
           v.srcObject.getTracks().forEach(track => track.stop());
@@ -1745,7 +1699,7 @@
 
     function tampilkanModalRankUp(tier) {
       const img = document.getElementById("rankup-modal-img");
-      img.src = tier.logo || "./icons/icon-512.png";
+      img.src = tier.logo || "./icons/logo-utuh.png";
       img.style.filter = `drop-shadow(0 0 25px ${tier.color})`;
 
       const nameEl = document.getElementById("rankup-modal-tiername");
@@ -1870,7 +1824,6 @@
             cls = "locked";
           }
         } else if (isLocked) {
-          // Anti-curang: saat kuis berlangsung jangan tampilkan benar/salah
           cls = (activeChoice === op.huruf) ? "selected-locked locked" : "locked";
         } else {
           cls = (activeChoice === op.huruf) ? "selected-temp" : "";
