@@ -1,4 +1,4 @@
-const CACHE_NAME = "volar-mtk-legend-v1.2";
+const CACHE_NAME = "volar-mtk-legend-v2.0";
 const ASSETS_TO_CACHE = [
   "./",
   "./index.html",
