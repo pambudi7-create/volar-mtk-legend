@@ -22,6 +22,9 @@
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
+  <!-- Google Model-Viewer untuk Mode Meja 360° & Deteksi Bidang Datar (ARCore/WebXR) -->
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.5.0/model-viewer.min.js"></script>
+
   <style>
     /* ===================================================================== */
     /* SISTEM TEMA DARK & LIGHT MODE MODERN (ESPORTS EDITION)                */
@@ -398,15 +401,22 @@
       overflow: hidden;
     }
     #ar-container {
-      position: relative;
-      width: 100%;
-      height: 100%;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
       overflow: hidden;
     }
     #ar-container a-scene {
+      position: absolute !important;
+      inset: 0 !important;
       width: 100% !important;
       height: 100% !important;
       display: block;
+    }
+    #ar-container video {
+      max-width: none !important;
+      max-height: none !important;
     }
     .ar-hud-top {
       position: fixed; top: 14px; left: 14px; right: 14px; z-index: 260;
@@ -418,9 +428,9 @@
       padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 800; pointer-events: auto;
     }
     .ar-hud-bottom {
-      position: fixed; bottom: 16px; left: 14px; right: 14px; z-index: 260;
-      background: rgba(11, 17, 32, 0.9); backdrop-filter: blur(10px);
-      border: 1.5px solid #fbbf24; border-radius: 18px; padding: 14px 16px;
+      position: fixed; bottom: 14px; left: 14px; right: 14px; z-index: 260;
+      background: rgba(11, 17, 32, 0.92); backdrop-filter: blur(10px);
+      border: 1.5px solid #fbbf24; border-radius: 18px; padding: 13px 15px;
       box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
     }
     .ar-scaf-tag {
@@ -430,8 +440,166 @@
       background: rgba(251, 191, 36, 0.2); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.45);
       margin-bottom: 5px;
     }
-    .ar-hud-bottom h3 { margin: 0 0 5px 0; font-size: 14px; color: #38bdf8; font-weight: 900; }
-    .ar-hud-bottom p { margin: 0; font-size: 12.5px; color: #f1f5f9; line-height: 1.48; }
+    .ar-hud-bottom h3 { margin: 0 0 4px 0; font-size: 14px; color: #38bdf8; font-weight: 900; }
+    .ar-hud-bottom p { margin: 0; font-size: 12px; color: #f1f5f9; line-height: 1.44; }
+
+    /* TOMBOL KONTEKSTUAL TARUH DI MEJA (LIHAT SAMPING 360°) */
+    .btn-table-mode-ar {
+      margin-top: 10px;
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid #fde047;
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 52%, #0284c7 100%);
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.45);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .btn-table-mode-ar.highlight-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0f172a;
+      box-shadow: 0 6px 20px rgba(251, 191, 36, 0.55);
+    }
+    .btn-table-mode-ar:active { transform: scale(0.97); }
+
+    /* ===================================================================== */
+    /* LAYAR MODE MEJA AR 360° & SURFACE TRACKING (<model-viewer>)           */
+    /* ===================================================================== */
+    #screen-table-ar {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      width: 100vw;
+      height: 100dvh;
+      background: radial-gradient(circle at 50% 28%, #172554 0%, #0b1120 62%, #050811 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .table-ar-topbar {
+      padding: 12px 14px 8px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      z-index: 10;
+    }
+    .table-model-switcher {
+      display: flex;
+      gap: 6px;
+      padding: 0 14px 8px 14px;
+      overflow-x: auto;
+      z-index: 10;
+    }
+    .table-switch-pill {
+      flex: 1;
+      min-width: 78px;
+      padding: 7px 8px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.8);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .table-switch-pill.active {
+      border-color: #fbbf24;
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(37, 99, 235, 0.45));
+      color: #fde047;
+      box-shadow: 0 0 14px rgba(251, 191, 36, 0.25);
+    }
+    .table-viewer-stage {
+      flex: 1;
+      position: relative;
+      min-height: 0;
+      width: 100%;
+    }
+    #table-model-viewer {
+      width: 100%;
+      height: 100%;
+      display: block;
+      --poster-color: transparent;
+    }
+    .table-gesture-hint {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(11, 17, 32, 0.78);
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      color: #bae6fd;
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 5px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+    }
+    .table-ar-bottom {
+      margin: 0 14px 14px 14px;
+      background: rgba(11, 17, 32, 0.94);
+      border: 1.5px solid #fbbf24;
+      border-radius: 18px;
+      padding: 12px 14px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+      z-index: 10;
+    }
+    .table-ar-bottom h3 {
+      margin: 0 0 4px 0;
+      font-size: 13.5px;
+      color: #38bdf8;
+      font-weight: 900;
+    }
+    .table-ar-bottom p {
+      margin: 0 0 10px 0;
+      font-size: 11.5px;
+      color: #e2e8f0;
+      line-height: 1.42;
+    }
+    .table-controls-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .btn-table-ctrl {
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(56, 189, 248, 0.45);
+      background: rgba(30, 41, 59, 0.9);
+      color: #f8fafc;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-table-ctrl:active { transform: scale(0.97); }
+    .btn-arcore-place {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 2px solid #fde047;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0f172a;
+      font-size: 12.5px;
+      font-weight: 900;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(251, 191, 36, 0.45);
+    }
+    .btn-arcore-place:active { transform: scale(0.98); }
 
     /* ===================================================================== */
     /* LEADERBOARD MINIMIZE / MAXIMIZE DI LAYAR SISWA                        */
@@ -940,7 +1108,7 @@
             <div class="quest-step-num">2</div>
             <div>
               <div style="font-weight:800; color:var(--text); margin-bottom:2px;">Scan Marker &amp; Amati dari Segala Sisi</div>
-              <div style="color:var(--muted); line-height:1.4;">Masuk ke menu <b>Eksplorasi AR 3D</b>, arahkan kamera ke Marker 1–4, lalu gerakkan HP mendekat atau mengelilingi objek untuk mengamatinya secara detail.</div>
+              <div style="color:var(--muted); line-height:1.4;">Masuk ke menu <b>Eksplorasi AR 3D</b>, arahkan kamera ke Marker 1–4, lalu gunakan tombol <b>Taruh di Meja (360°)</b> bila ingin memperbesar atau melihat bangun ruang dari samping.</div>
             </div>
           </div>
           <div class="quest-step-row">
@@ -1178,7 +1346,7 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- LAYAR KAMERA WEBAR (MINDAR 4 MARKER + ANTI-JITTER + SCAFFOLDING)      -->
+  <!-- LAYAR KAMERA WEBAR (MINDAR 4 MARKER + RESPONSIF + TOMBOL MEJA 360°)   -->
   <!-- ===================================================================== -->
   <div id="screen-ar" class="hidden">
     <div class="ar-hud-top">
@@ -1188,9 +1356,67 @@
     <div class="ar-hud-bottom">
       <div class="ar-scaf-tag" id="ar-scaf-tag">💡 PANDUAN PENGAMATAN</div>
       <h3 id="ar-info-title">Arahkan Kamera ke Marker 1 – 4 pada LKPD</h3>
-      <p id="ar-info-desc">Letakkan LKPD mendatar di tempat terang. Dekatkan atau kelilingi marker untuk mengamati objek 3D dari segala arah.</p>
+      <p id="ar-info-desc">Letakkan LKPD mendatar di tempat terang. Arahkan HP miring 35°–60°, atau tekan tombol di bawah untuk melihat dari samping 360° di atas meja.</p>
+      <button type="button" id="btn-open-table-ar" class="btn-table-mode-ar" onclick="bukaModeMejaDariAR()">
+        📐 Taruh di Meja (Lihat Samping 360°)
+      </button>
     </div>
     <div id="ar-container"></div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- LAYAR MODE MEJA AR 360° & SURFACE TRACKING (MODEL-VIEWER ARCORE)      -->
+  <!-- ===================================================================== -->
+  <div id="screen-table-ar" class="hidden">
+    <div class="table-ar-topbar">
+      <button type="button" class="ar-pill" style="cursor:pointer;" onclick="kembaliKeScanLKPD()">⬅ Scan LKPD</button>
+      <div class="ar-pill" id="table-active-badge" style="color:#fde047;">🧊 Mode Meja 360°</div>
+      <button type="button" class="ar-pill" style="cursor:pointer;" onclick="tutupModeMejaKeBeranda()">🏠</button>
+    </div>
+
+    <div class="table-model-switcher" id="table-model-switcher">
+      <button type="button" class="table-switch-pill active" data-idx="0" onclick="pilihModelMeja(0)">M1 Kubus</button>
+      <button type="button" class="table-switch-pill" data-idx="1" onclick="pilihModelMeja(1)">M2 Balok</button>
+      <button type="button" class="table-switch-pill" data-idx="2" onclick="pilihModelMeja(2)">M3 Prisma 3</button>
+      <button type="button" class="table-switch-pill" data-idx="3" onclick="pilihModelMeja(3)">M4 Prisma 5</button>
+    </div>
+
+    <div class="table-viewer-stage">
+      <div class="table-gesture-hint">☝️ Geser: Putar 360° &amp; Samping • 🤏 Cubit: Perbesar</div>
+      <model-viewer
+        id="table-model-viewer"
+        src="./models/m1_kubus.glb?v=3"
+        alt="Model 3D Bangun Ruang VOLAR MTK Legend"
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        ar-scale="auto"
+        ar-placement="floor"
+        camera-controls
+        touch-action="pan-y"
+        autoplay
+        shadow-intensity="1"
+        exposure="1.12"
+        environment-image="neutral"
+        camera-orbit="35deg 66deg auto"
+        min-camera-orbit="auto 0deg auto"
+        max-camera-orbit="auto 95deg auto"
+        scale="0.05 0.05 0.05">
+        <button slot="ar-button" style="display:none;"></button>
+      </model-viewer>
+    </div>
+
+    <div class="table-ar-bottom">
+      <div class="ar-scaf-tag" id="table-scaf-tag">🔍 PERTANYAAN PEMANTIK • MARKER 1</div>
+      <h3 id="table-info-title">Eksplorasi Kubus Satuan</h3>
+      <p id="table-info-desc">Amati bangun ruang ini dari atas maupun sejajar sisi samping!</p>
+      <div class="table-controls-row">
+        <button type="button" class="btn-table-ctrl" onclick="putarUlangAnimasiMeja()">🔄 Ulang Animasi</button>
+        <button type="button" class="btn-table-ctrl" onclick="lihatDariSampingMeja()">👁️ Sudut Samping</button>
+      </div>
+      <button type="button" class="btn-arcore-place" onclick="aktifkanARCoreMeja()">
+        📱 Taruh di Meja Nyata (Deteksi Bidang ARCore)
+      </button>
+    </div>
   </div>
 
   <!-- ===================================================================== -->
@@ -1284,9 +1510,10 @@
 
   <script>
     // =========================================================================
-    // 1. KONFIGURASI URL WEB APP APPS SCRIPT
+    // 1. KONFIGURASI URL WEB APP APPS SCRIPT & VERSI CACHE ASET 3D
     // =========================================================================
     const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx00KuVvhr4PGQ2jf17mP-8iEJCgdTbvJiqjbnPmLkXbIFFZUt9hStRUYJxwRGT2Ech/exec";
+    const MODEL_VERSION = "3";
 
     // Daftarkan Service Worker
     if ("serviceWorker" in navigator) {
@@ -1434,7 +1661,7 @@
     }
 
     // =========================================================================
-    // 4. NAVIGASI LAYAR UTAMA & WEBAR (BERSIH TANPA PANGGUNG + ANTI-JITTER)
+    // 4. NAVIGASI LAYAR UTAMA, WEBAR MINDAR & MODE MEJA 360° (MODEL-VIEWER)
     // =========================================================================
     function sembunyikanSemuaLayar() {
       ["screen-home", "screen-login", "screen-exam", "screen-review", "screen-result"].forEach(id => {
@@ -1456,6 +1683,40 @@
       document.getElementById("screen-login").classList.remove("hidden");
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+
+    // KONFIGURASI 4 MODEL 3D (VERSI CACHE ?v=3 & SKALA FISIK MEJA ~30-35 CM)
+    const AR_MODELS = [
+      {
+        index: 0,
+        shortName: "Marker 1: Kubus Satuan",
+        src: `./models/m1_kubus.glb?v=${MODEL_VERSION}`,
+        markerScale: "0.42 0.42 0.42",
+        tableArScale: "0.05 0.05 0.05"
+      },
+      {
+        index: 1,
+        shortName: "Marker 2: Balok 3×4×3",
+        src: `./models/m2_balok.glb?v=${MODEL_VERSION}`,
+        markerScale: "0.34 0.34 0.34",
+        tableArScale: "0.038 0.038 0.038"
+      },
+      {
+        index: 2,
+        shortName: "Marker 3: Prisma Segitiga",
+        src: `./models/m3_prisma3.glb?v=${MODEL_VERSION}`,
+        markerScale: "0.32 0.32 0.32",
+        tableArScale: "0.035 0.035 0.035"
+      },
+      {
+        index: 3,
+        shortName: "Marker 4: Prisma Segilima",
+        src: `./models/m4_prisma5.glb?v=${MODEL_VERSION}`,
+        markerScale: "0.32 0.32 0.32",
+        tableArScale: "0.036 0.036 0.036"
+      }
+    ];
+
+    let activeArModelIndex = 0;
 
     // PERTANYAAN PEMANTIK (SCAFFOLDING) TANPA BOCORAN RUMUS
     const SCAFFOLDING_MARKER = [
@@ -1481,13 +1742,34 @@
       }
     ];
 
+    function hentikanKameraMindAR() {
+      const sceneEl = document.querySelector("#ar-container a-scene");
+      if (sceneEl && sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
+        try { sceneEl.systems["mindar-image-system"].stop(); } catch (e) {}
+      }
+      document.querySelectorAll("video").forEach(v => {
+        if (v.srcObject) {
+          v.srcObject.getTracks().forEach(track => track.stop());
+          v.srcObject = null;
+        }
+        v.remove();
+      });
+      document.querySelectorAll(".mindar-ui-overlay").forEach(el => el.remove());
+      document.getElementById("ar-container").innerHTML = "";
+    }
+
     function bukaModeAR() {
+      document.getElementById("screen-table-ar").classList.add("hidden");
       document.getElementById("screen-ar").classList.remove("hidden");
       document.getElementById("ar-status-badge").textContent = "Mencari Marker LKPD...";
       document.getElementById("ar-status-badge").style.color = "#93c5fd";
       document.getElementById("ar-scaf-tag").textContent = "💡 PANDUAN PENGAMATAN";
       document.getElementById("ar-info-title").textContent = "Arahkan Kamera ke Marker 1 – 4 pada LKPD";
-      document.getElementById("ar-info-desc").textContent = "Letakkan LKPD mendatar di tempat terang. Dekatkan atau kelilingi marker untuk mengamati objek 3D dari segala arah.";
+      document.getElementById("ar-info-desc").textContent = "Letakkan LKPD mendatar di tempat terang. Arahkan HP miring 35°–60°, atau tekan tombol di bawah untuk melihat dari samping 360° di atas meja.";
+
+      const btnTable = document.getElementById("btn-open-table-ar");
+      btnTable.classList.remove("highlight-gold");
+      btnTable.textContent = "📐 Taruh di Meja (Lihat Samping 360°)";
 
       const container = document.getElementById("ar-container");
 
@@ -1501,7 +1783,7 @@
                 this.mixer = new THREE.AnimationMixer(model);
                 model.animations.forEach((clip) => {
                   const action = this.mixer.clipAction(clip);
-                  action.timeScale = 0.82;
+                  action.timeScale = 0.85;
                   action.play();
                 });
               }
@@ -1516,7 +1798,7 @@
       container.innerHTML = `
         <a-scene
           embedded
-          mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: yes; uiScanning: yes; filterMinCF: 0.0001; filterBeta: 0.001; missTolerance: 5; warmupTolerance: 5;"
+          mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiLoading: yes; uiScanning: yes; filterMinCF: 0.001; filterBeta: 0.01; missTolerance: 5; warmupTolerance: 3;"
           color-space="sRGB"
           renderer="colorManagement: true; physicallyCorrectLights: true; precision: mediump; antialias: true;"
           vr-mode-ui="enabled: false"
@@ -1530,34 +1812,46 @@
 
           <!-- MARKER 1: Kubus Satuan -->
           <a-entity id="target-0" mindar-image-target="targetIndex: 0">
-            <a-gltf-model src="./models/m1_kubus.glb" position="0 0 0.02" rotation="90 0 0" scale="0.28 0.28 0.28" smooth-anim></a-gltf-model>
+            <a-gltf-model src="${AR_MODELS[0].src}" position="0 0 0.02" rotation="90 0 0" scale="${AR_MODELS[0].markerScale}" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 2: Balok 3x4x3 -->
           <a-entity id="target-1" mindar-image-target="targetIndex: 1">
-            <a-gltf-model src="./models/m2_balok.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+            <a-gltf-model src="${AR_MODELS[1].src}" position="0 0 0.02" rotation="90 0 0" scale="${AR_MODELS[1].markerScale}" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 3: Prisma Segitiga -->
           <a-entity id="target-2" mindar-image-target="targetIndex: 2">
-            <a-gltf-model src="./models/m3_prisma3.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+            <a-gltf-model src="${AR_MODELS[2].src}" position="0 0 0.02" rotation="90 0 0" scale="${AR_MODELS[2].markerScale}" smooth-anim></a-gltf-model>
           </a-entity>
 
           <!-- MARKER 4: Prisma Segilima -->
           <a-entity id="target-3" mindar-image-target="targetIndex: 3">
-            <a-gltf-model src="./models/m4_prisma5.glb" position="0 0 0.02" rotation="90 0 0" scale="0.24 0.24 0.24" smooth-anim></a-gltf-model>
+            <a-gltf-model src="${AR_MODELS[3].src}" position="0 0 0.02" rotation="90 0 0" scale="${AR_MODELS[3].markerScale}" smooth-anim></a-gltf-model>
           </a-entity>
         </a-scene>
       `;
 
+      // Kunci sinkronisasi proporsi layar & kanvas WebGL segera setelah kamera AR siap (anti-gepeng)
+      const sceneEl = container.querySelector("a-scene");
+      if (sceneEl) {
+        sceneEl.addEventListener("arReady", () => {
+          setTimeout(() => window.dispatchEvent(new Event("resize")), 180);
+        });
+      }
+
       for (let i = 0; i < 4; i++) {
         const el = document.getElementById(`target-${i}`);
         el.addEventListener("targetFound", () => {
+          activeArModelIndex = i;
           document.getElementById("ar-status-badge").textContent = `✔ Marker ${i + 1} Terkunci`;
           document.getElementById("ar-status-badge").style.color = "#34d399";
           document.getElementById("ar-scaf-tag").textContent = SCAFFOLDING_MARKER[i].tag;
           document.getElementById("ar-info-title").textContent = SCAFFOLDING_MARKER[i].judul;
           document.getElementById("ar-info-desc").textContent = SCAFFOLDING_MARKER[i].pertanyaan;
+
+          btnTable.classList.add("highlight-gold");
+          btnTable.textContent = `📐 Taruh Marker ${i + 1} di Meja (Lihat Samping 360°)`;
         });
         el.addEventListener("targetLost", () => {
           document.getElementById("ar-status-badge").textContent = "Mencari Marker LKPD...";
@@ -1567,20 +1861,74 @@
     }
 
     function tutupModeAR() {
-      const sceneEl = document.querySelector("#ar-container a-scene");
-      if (sceneEl && sceneEl.systems && sceneEl.systems["mindar-image-system"]) {
-        try { sceneEl.systems["mindar-image-system"].stop(); } catch (e) {}
-      }
-      document.querySelectorAll("video").forEach(v => {
-        if (v.srcObject) {
-          v.srcObject.getTracks().forEach(track => track.stop());
-          v.srcObject = null;
-        }
-        v.remove();
-      });
-      document.querySelectorAll(".mindar-ui-overlay").forEach(el => el.remove());
-      document.getElementById("ar-container").innerHTML = "";
+      hentikanKameraMindAR();
       document.getElementById("screen-ar").classList.add("hidden");
+    }
+
+    function bukaModeMejaDariAR() {
+      hentikanKameraMindAR();
+      document.getElementById("screen-ar").classList.add("hidden");
+      document.getElementById("screen-table-ar").classList.remove("hidden");
+      pilihModelMeja(activeArModelIndex);
+    }
+
+    function pilihModelMeja(idx) {
+      activeArModelIndex = idx;
+      const model = AR_MODELS[idx];
+      const scaf = SCAFFOLDING_MARKER[idx];
+      const viewer = document.getElementById("table-model-viewer");
+
+      document.querySelectorAll("#table-model-switcher .table-switch-pill").forEach(btn => {
+        const bIdx = parseInt(btn.getAttribute("data-idx"), 10);
+        btn.classList.toggle("active", bIdx === idx);
+      });
+
+      document.getElementById("table-active-badge").textContent = `🧊 ${model.shortName}`;
+      document.getElementById("table-scaf-tag").textContent = scaf.tag;
+      document.getElementById("table-info-title").textContent = scaf.judul;
+      document.getElementById("table-info-desc").textContent = scaf.pertanyaan;
+
+      if (viewer) {
+        viewer.setAttribute("scale", model.tableArScale);
+        viewer.setAttribute("src", model.src);
+        viewer.cameraOrbit = "35deg 66deg auto";
+      }
+    }
+
+    function putarUlangAnimasiMeja() {
+      const viewer = document.getElementById("table-model-viewer");
+      if (!viewer) return;
+      try {
+        viewer.pause();
+        viewer.currentTime = 0;
+        viewer.play();
+      } catch (e) {}
+    }
+
+    function lihatDariSampingMeja() {
+      const viewer = document.getElementById("table-model-viewer");
+      if (!viewer) return;
+      viewer.cameraOrbit = "0deg 87deg auto";
+    }
+
+    function aktifkanARCoreMeja() {
+      const viewer = document.getElementById("table-model-viewer");
+      if (!viewer) return;
+      if (viewer.canActivateAR && typeof viewer.activateAR === "function") {
+        viewer.activateAR();
+      } else {
+        alert("Perangkat atau browser ini belum mendukung deteksi meja otomatis (ARCore). Kamu tetap bisa memutar 360°, menekan 'Sudut Samping', dan mencubit layar dengan 2 jari untuk memperbesar objek!");
+      }
+    }
+
+    function kembaliKeScanLKPD() {
+      document.getElementById("screen-table-ar").classList.add("hidden");
+      bukaModeAR();
+    }
+
+    function tutupModeMejaKeBeranda() {
+      document.getElementById("screen-table-ar").classList.add("hidden");
+      kembaliKeBeranda();
     }
 
     // =========================================================================
